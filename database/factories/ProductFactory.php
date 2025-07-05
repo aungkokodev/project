@@ -25,7 +25,7 @@ class ProductFactory extends Factory
             'price' => fake()->numberBetween(1000, 10000),
             'stock_quantity' => fake()->numberBetween(0, 100),
             // 'sku' => 'SKU-' . fake()->unique()->randomNumber(6),
-            'image' => 'products/Wonder.jpg',
+            'image' => '/storage/products/Wonder.jpg',
             'unit' => fake()->randomElement(['kg', 'liter', 'bag', 'package']),
             'is_featured' => fake()->boolean(),
             'status' => fake()->randomElement(['active', 'inactive']),

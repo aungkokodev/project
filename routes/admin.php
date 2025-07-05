@@ -35,10 +35,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     ->name('password.update');
 });
 
-Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->group(function () {
   Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
   Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
-  Route::get('/profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
+  Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
   Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
 
   Route::resource('products', AdminProductController::class)->except('show');

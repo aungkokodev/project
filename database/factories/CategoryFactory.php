@@ -20,7 +20,7 @@ class CategoryFactory extends Factory
             'name' => fake()->randomElement(['Fertilizers', 'Pesticides', 'Seeds', 'Tools']),
             'slug' => fake()->slug(),
             'description' => fake()->sentence(),
-            'image' => 'categories/Wonder.jpg'
+            'image' => '/storage/categories/Wonder.jpg'
         ];
     }
 }

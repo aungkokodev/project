@@ -19,7 +19,7 @@ class ProductImageFactory extends Factory
     {
         return [
             'product_id' => Product::factory(),
-            'image_path' => 'product_images/Wonder.jpg',
+            'image_path' => '/storage/product_images/Wonder.jpg',
             'is_default' => fake()->boolean(),
         ];
     }
