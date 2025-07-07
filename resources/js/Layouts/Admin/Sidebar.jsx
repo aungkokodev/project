@@ -178,13 +178,13 @@ function Profile() {
 function Sidebar() {
     return (
         <div className="h-full bg-slate-100 border-r relative">
-            <header className="h-16 px-8 flex gap-2 items-center border-b">
+            <header className="h-16 px-10 flex gap-2 items-center border-b">
                 <GrassOutlined className="text-green-600" />
                 <span className="font-bold text-lg mt-1">Agri Supply</span>
             </header>
 
             <nav className="h-[calc(100vh-128px)] overflow-y-auto">
-                <List className="p-4">
+                <List className="p-5">
                     {getNavItems().map((menu, index) => (
                         <NavItem menu={menu} key={index} />
                     ))}
@@ -224,11 +224,11 @@ function getNavItems() {
                     icon: <StarBorderOutlined />,
                     url: "/admin/reviews",
                 },
-                {
-                    text: "Inventory",
-                    icon: <Inventory2Outlined />,
-                    url: "/admin/inventory",
-                },
+                // {
+                //     text: "Inventory",
+                //     icon: <Inventory2Outlined />,
+                //     url: "/admin/inventory",
+                // },
             ],
         },
         {
@@ -248,17 +248,17 @@ function getNavItems() {
                 {
                     text: "Sale",
                     icon: <TrendingUpOutlined />,
-                    url: "/admin/reports/sale",
+                    url: "/admin/reports/sales",
                 },
                 {
                     text: "Product",
                     icon: <WidgetsOutlined />,
-                    url: "/admin/reports/product",
+                    url: "/admin/reports/products",
                 },
                 {
                     text: "Customer",
                     icon: <PersonOutline />,
-                    url: "/admin/reports/customer",
+                    url: "/admin/reports/customers",
                 },
             ],
         },

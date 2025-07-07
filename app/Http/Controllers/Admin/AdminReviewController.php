@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Review;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AdminReviewController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Inertia::render('Admin/Review/Index', [
+            'reviews' => Review::with(['user', 'product'])->get()
+        ]);
     }
 
     /**

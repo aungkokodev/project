@@ -2,13 +2,13 @@ import { Link, usePage } from "@inertiajs/react";
 import { Breadcrumbs } from "@mui/material";
 
 // Done
-function Topbar() {
+function Topbar({ title }) {
     const page = usePage();
 
     return (
-        <div className="h-16 px-8 flex gap-8 items-center">
-            <h1 className="font-bold text-lg">{getPageName(page.component)}</h1>
-            <Breadcrumbs className="text-inherit text-xs">
+        <div className="h-16 px-10 flex gap-10 items-center border-b sticky top-0 z-50 bg-white">
+            {title && <h1 className="font-bold text-lg">{title}</h1>}
+            <Breadcrumbs className="text-inherit">
                 {generateBreadcrumbs(page.url)}
             </Breadcrumbs>
         </div>
@@ -23,6 +23,8 @@ function generateBreadcrumbs(url) {
         .slice(1);
 
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+    if (paths.length < 2) return null;
 
     return paths.map((path, index) => {
         const route = `${prefix}/${paths.slice(0, index + 1).join("/")}`;
@@ -39,10 +41,6 @@ function generateBreadcrumbs(url) {
             </Link>
         );
     });
-}
-
-function getPageName(path) {
-    return path.split("/")[1];
 }
 
 export default Topbar;

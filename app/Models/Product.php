@@ -9,4 +9,37 @@ use Illuminate\Notifications\Notifiable;
 class Product extends Model
 {
     use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'name',
+        'category_id',
+        'slug',
+        'description',
+        'price',
+        'stock_quantity',
+        'unit',
+        'is_featured',
+        'is_active',
+    ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+
+    protected static function booted()
+    {
+        static::creating(function ($product) {
+
+            $combined = uuid_create() . '-' . $product->name;
+
+            $product->slug = substr(sha1($combined), 0, 16);
+        });
+    }
 }

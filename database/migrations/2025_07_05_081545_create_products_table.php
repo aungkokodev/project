@@ -19,11 +19,9 @@ return new class extends Migration
             $table->text('description');
             $table->decimal('price', 10, 0);
             $table->integer('stock_quantity')->default(0);
-            // $table->string('sku')->unique();
-            $table->string('image')->nullable();
             $table->string('unit');
             $table->boolean('is_featured')->default(false);
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
