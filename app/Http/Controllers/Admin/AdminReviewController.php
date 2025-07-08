@@ -11,56 +11,22 @@ class AdminReviewController extends Controller
 {
     public function index()
     {
+        $reviews = Review::with(['user', 'product.images'])->latest()->get();
+
         return Inertia::render('Admin/Review/Index', [
-            'reviews' => Review::with(['user', 'product'])->get()
+            'reviews' => $reviews
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function status(Request $request, Review $review)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $review->update([
+            'is_active' => $request->is_active
+        ]);
     }
 }

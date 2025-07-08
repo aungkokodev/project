@@ -32,6 +32,11 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
 
     protected static function booted()
     {

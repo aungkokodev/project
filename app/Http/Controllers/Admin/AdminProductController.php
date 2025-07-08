@@ -183,6 +183,13 @@ class AdminProductController extends Controller
         ]);
     }
 
+    //
+    public function featured(Request $request, Product $product)
+    {
+        $product->update([
+            'is_featured' => $request->is_featured
+        ]);
+    }
 
     // 
     public function destroy(string $id)

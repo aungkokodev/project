@@ -1,4 +1,4 @@
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import {
     FavoriteBorderOutlined,
     GrassOutlined,
@@ -9,8 +9,11 @@ import {
 
 function Header() {
     return (
-        <header className="h-16 p-4 flex gap-4 items-center">
-            <h1 className="flex gap-2 items-center text-lg font-bold me-auto">
+        <header className="h-16 p-5 flex gap-5 items-center">
+            <h1
+                className="flex gap-2.5 items-center text-lg font-bold me-auto cursor-pointer"
+                onClick={() => router.visit("/")}
+            >
                 <GrassOutlined className="w-10 h-10 text-green-600" />
                 <span>Agri Supply</span>
             </h1>

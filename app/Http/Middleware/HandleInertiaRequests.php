@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 
@@ -43,6 +44,14 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
             ],
+            'categories' => function () {
+                return Cache::remember('global_categories', now()->addDay(), function () {
+                    return \App\Models\Category::with('children')
+                        ->whereNull('parent_id')
+                        ->orderBy('name')
+                        ->get();
+                });
+            },
         ];
     }
 }

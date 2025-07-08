@@ -61,7 +61,6 @@ class AdminCategoryController extends Controller
     // 
     public function show(string $slug)
     {
-
         $category = Category::where('slug', $slug)
             ->with(['parent'])
             ->get()

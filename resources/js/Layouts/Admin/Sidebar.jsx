@@ -60,7 +60,7 @@ function NavItem({ menu }) {
             <LinkOrDiv href={menu.url} onClick={toggle}>
                 <ListItemButton
                     className={clsx(
-                        "rounded-lg",
+                        "rounded-lg transition-all",
                         activeStyle(menu.url),
                         parentActiveStyle(menu.children?.map((c) => c.url))
                     )}
@@ -68,7 +68,9 @@ function NavItem({ menu }) {
                     <ListItemIcon className="min-w-8 text-inherit">
                         {menu.icon}
                     </ListItemIcon>
-                    <ListItemText>{menu.text}</ListItemText>
+                    <ListItemText>
+                        <span className="text-sm">{menu.text}</span>
+                    </ListItemText>
                     {menu.children &&
                         (open ? (
                             <KeyboardArrowDownOutlined />
@@ -85,14 +87,18 @@ function NavItem({ menu }) {
                             <Link key={index} href={child.url}>
                                 <ListItemButton
                                     className={clsx(
-                                        "rounded-lg",
+                                        "rounded-lg transition-all",
                                         activeStyle(child.url)
                                     )}
                                 >
                                     <ListItemIcon className="min-w-8 text-inherit">
                                         {child.icon}
                                     </ListItemIcon>
-                                    <ListItemText>{child.text}</ListItemText>
+                                    <ListItemText>
+                                        <span className="text-sm">
+                                            {child.text}
+                                        </span>
+                                    </ListItemText>
                                 </ListItemButton>
                             </Link>
                         ))}
@@ -202,62 +208,62 @@ function getNavItems() {
     return [
         {
             text: "Dashboard",
-            icon: <DashboardOutlined />,
+            icon: <DashboardOutlined fontSize="small" />,
             url: "/admin/dashboard",
         },
         {
             text: "Products",
-            icon: <ListAltOutlined />,
+            icon: <ListAltOutlined fontSize="small" />,
             children: [
                 {
                     text: "Products",
-                    icon: <WidgetsOutlined />,
+                    icon: <WidgetsOutlined fontSize="small" />,
                     url: "/admin/products",
                 },
                 {
                     text: "Categories",
-                    icon: <CategoryOutlined />,
+                    icon: <CategoryOutlined fontSize="small" />,
                     url: "/admin/categories",
                 },
                 {
                     text: "Reviews",
-                    icon: <StarBorderOutlined />,
+                    icon: <StarBorderOutlined fontSize="small" />,
                     url: "/admin/reviews",
                 },
                 // {
                 //     text: "Inventory",
-                //     icon: <Inventory2Outlined />,
+                //     icon: <Inventory2Outlined fontSize="small" />,
                 //     url: "/admin/inventory",
                 // },
             ],
         },
         {
             text: "Orders",
-            icon: <ShoppingCartOutlined />,
+            icon: <ShoppingCartOutlined fontSize="small" />,
             url: "/admin/orders",
         },
         {
             text: "Customers",
-            icon: <PersonOutline />,
+            icon: <PersonOutline fontSize="small" />,
             url: "/admin/customers",
         },
         {
             text: "Reports",
-            icon: <LeaderboardOutlined />,
+            icon: <LeaderboardOutlined fontSize="small" />,
             children: [
                 {
                     text: "Sale",
-                    icon: <TrendingUpOutlined />,
+                    icon: <TrendingUpOutlined fontSize="small" />,
                     url: "/admin/reports/sales",
                 },
                 {
                     text: "Product",
-                    icon: <WidgetsOutlined />,
+                    icon: <WidgetsOutlined fontSize="small" />,
                     url: "/admin/reports/products",
                 },
                 {
                     text: "Customer",
-                    icon: <PersonOutline />,
+                    icon: <PersonOutline fontSize="small" />,
                     url: "/admin/reports/customers",
                 },
             ],

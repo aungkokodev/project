@@ -2,11 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\{
-  AdminAuthController,
   AdminDashboardController,
   AdminProfileController,
   AdminProductController,
-  AdminProductImageController,
   AdminCategoryController,
   AdminOrderController,
   AdminOrderItemController,
@@ -16,7 +14,6 @@ use App\Http\Controllers\Admin\{
   AdminSettingController,
   AdminPaymentSettingController,
   AdminDiscountController,
-  AdminInventoryController
 };
 
 // Route::prefix('admin')->name('admin.')->group(function () {
@@ -37,10 +34,17 @@ use App\Http\Controllers\Admin\{
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->group(function () {
   Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+  //
   Route::resource('categories', AdminCategoryController::class);
 
+  //
   Route::resource('products', AdminProductController::class);
   Route::put('products/{product}/status', [AdminProductController::class, 'status'])->name('products.status');
+  Route::put('products/{product}/featured', [AdminProductController::class, 'featured'])->name('products.featured');
+
+  // 
+  Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+  Route::put('reviews/{review}/status', [AdminReviewController::class, 'status'])->name('reviews.status');
 
   Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
   Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
@@ -61,20 +65,11 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->grou
   Route::delete('customers/{user}', [AdminCustomerController::class, 'destroy'])
     ->name('customers.destroy');
 
-  Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
-  Route::get('reviews/{review}', [AdminReviewController::class, 'show'])->name('reviews.show');
-  Route::delete('reviews/{review}', [AdminReviewController::class, 'destroy'])
-    ->name('reviews.destroy');
-  Route::post('reviews/{review}/approve', [AdminReviewController::class, 'approve'])
-    ->name('reviews.approve');
-  Route::post('reviews/{review}/reject', [AdminReviewController::class, 'reject'])
-    ->name('reviews.reject');
-
   Route::resource('discounts', AdminDiscountController::class)->except('show');
 
-  Route::get('inventory', [AdminInventoryController::class, 'index'])->name('inventory.index');
-  Route::put('inventory/{product}/update-stock', [AdminInventoryController::class, 'updateStock'])
-    ->name('inventory.update-stock');
+  // Route::get('inventory', [AdminInventoryController::class, 'index'])->name('inventory.index');
+  // Route::put('inventory/{product}/update-stock', [AdminInventoryController::class, 'updateStock'])
+  //   ->name('inventory.update-stock');
 
   Route::get('reports/sales', [AdminReportController::class, 'sales'])->name('reports.sales');
   Route::get('reports/products', [AdminReportController::class, 'products'])

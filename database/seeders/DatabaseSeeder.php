@@ -627,6 +627,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'မြေသြဇာများ',
                 'description' => 'စိုက်ပျိုးမှုတိုးတက်စေသော မြေဆီလွှာအာဟာရများ',
+                'image' => "example.jpg",
                 'products' => [
                     ['name' => 'ရွှေကောမက်', 'description' => 'မြေဓာတ်မြင့်သောသဘာဝမြေသြဇာ'],
                     ['name' => 'စိုက်ထွေးဓာတ်မြေသြဇာ', 'description' => 'မြေညိုမှု သက်သာစေသော မြေသြဇာ'],

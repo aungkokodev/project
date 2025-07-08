@@ -1,98 +1,114 @@
-import IconWithTooltip from "@/Components/IconWithTooltip";
+import EmptyDataGrid from "@/Components/EmptyDataGrid";
+import LinkDataCell from "@/Components/LinkDataCell";
 import Layout from "@/Layouts/Admin/Layout";
-import { FolderOffOutlined, LaunchOutlined } from "@mui/icons-material";
-import { Avatar, Rating, Switch } from "@mui/material";
+import { router, usePage } from "@inertiajs/react";
+import { Drawer, Rating, Switch } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-
-function EmptyData() {
-    return (
-        <div className="flex gap-2 flex-col items-center justify-center p-4">
-            <FolderOffOutlined className="w-10 h-10" />
-            <p>No reviews</p>
-        </div>
-    );
-}
-
-const columns = [
-    { field: "id", headerName: "#", width: 64 },
-    {
-        field: "user",
-        headerName: "Customer",
-        valueGetter: (v) => v.name,
-        renderCell: (p) => (
-            <div className="flex gap-2 items-center">
-                <Avatar src={p.row.user.avatar} />
-                <span>{p.value}</span>
-            </div>
-        ),
-        flex: 1,
-    },
-    {
-        field: "product",
-        headerName: "Product",
-        valueGetter: (v) => v.name,
-        renderCell: (p) => (
-            <div className="flex gap-2 items-center">
-                <Avatar src={p.row.product.image} variant="square" />
-                <span>{p.value}</span>
-            </div>
-        ),
-        flex: 1,
-    },
-    {
-        field: "rating",
-        headerName: "Rating",
-        renderCell: (p) => (
-            <div className="flex h-full items-center">
-                <Rating value={p.value} readOnly />
-            </div>
-        ),
-        flex: 1,
-    },
-    {
-        field: "comment",
-        headerName: "Comment",
-        flex: 1,
-    },
-    {
-        field: "is_active",
-        headerName: "Show",
-        renderCell: (p) => (
-            <div className="flex h-full items-center">
-                <Switch checked={Boolean(p.value)} color="success" />
-            </div>
-        ),
-    },
-    // {
-    //     field: "actions",
-    //     headerName: "Actions",
-    //     renderCell: () => (
-    //         <div className="flex gap-1 items-center justify-center">
-    //             <IconWithTooltip icon={<LaunchOutlined />} title="view" />
-    //         </div>
-    //     ),
-    // },
-];
+import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 function Index({ reviews }) {
+    const { flash } = usePage().props;
+
+    const [current, setCurrent] = useState(null);
+
+    useEffect(() => {
+        if (toast.success) toast.success(flash.success);
+    }, [flash.success]);
+
+    const columns = [
+        {
+            field: "id",
+            headerName: "#",
+            width: 64,
+        },
+        {
+            field: "user",
+            headerName: "Customer",
+            valueGetter: (v) => v.name,
+            renderCell: ({ row }) => (
+                <LinkDataCell
+                    text={row.user.name}
+                    url={`/admin/users/${row.user.id}`}
+                    avatar={row.user.avatar}
+                    avatarVariant="circle"
+                />
+            ),
+            flex: 1,
+        },
+        {
+            field: "product",
+            headerName: "Product",
+            valueGetter: (v) => v.name,
+            renderCell: ({ row }) => (
+                <LinkDataCell
+                    text={row.product.name}
+                    url={`/admin/products/${row.product.slug}`}
+                    avatar={row.product.images.find((i) => i.is_default).path}
+                />
+            ),
+            flex: 1,
+        },
+        {
+            field: "rating",
+            headerName: "Rating",
+            renderCell: ({ value }) => (
+                <div className="h-full flex items-center">
+                    <Rating value={value} readOnly />
+                </div>
+            ),
+            flex: 1,
+        },
+        {
+            field: "comment",
+            headerName: "Comment",
+            renderCell: ({ value, id }) => (
+                <LinkDataCell text={value} onClick={() => setCurrent(id)} />
+            ),
+            flex: 1,
+        },
+        {
+            field: "is_active",
+            headerName: "Status",
+            renderCell: ({ row, value }) => (
+                <Switch
+                    color="success"
+                    checked={Boolean(value)}
+                    onClick={() =>
+                        router.put(`/admin/reviews/${row.id}/status`, {
+                            is_active: !row.is_active,
+                        })
+                    }
+                />
+            ),
+        },
+    ];
+
     return (
-        <div>
+        <>
             <DataGrid
                 rows={reviews}
                 columns={columns}
                 showToolbar
                 disableColumnMenu
-                pageSizeOptions={[8, 10, 25, 50, 100]}
+                sortingOrder={["asc", "desc"]}
+                pageSizeOptions={[7, 10, 25, 50, 100]}
                 initialState={{
-                    pagination: { paginationModel: { page: 0, pageSize: 8 } },
+                    pagination: { paginationModel: { page: 0, pageSize: 7 } },
                 }}
-                slots={{ noRowsOverlay: EmptyData }}
-                className="text-inherit px-4 rounded-lg"
+                slots={{ noRowsOverlay: EmptyDataGrid }}
+                className="text-inherit px-5 rounded-lg"
             />
-        </div>
+            <Drawer
+                open={Boolean(current)}
+                onClose={() => setCurrent(null)}
+                anchor="right"
+            ></Drawer>
+            <ToastContainer />
+        </>
     );
 }
 
-Index.layout = (page) => <Layout children={page} />;
+Index.layout = (page) => <Layout children={page} title={"Customer Reviews"} />;
 
 export default Index;

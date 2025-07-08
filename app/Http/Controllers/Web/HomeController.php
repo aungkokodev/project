@@ -11,9 +11,17 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'images'])->where('status', 'active')->get();
-        $categories = Category::whereNull('parent_id')->with(['children'])->get();
+        $products = Product::where('is_active', 1)
+            ->with(['category', 'images'])
+            ->get();
 
-        return Inertia::render("Web/Home/Index", ['products' => $products, 'categories' => $categories]);
+        $categories = Category::whereNull('parent_id')
+            ->with(['children'])
+            ->get();
+
+        return Inertia::render("Web/Home", [
+            'products' => $products,
+            'categories' => $categories
+        ]);
     }
 }

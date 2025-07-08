@@ -62,10 +62,26 @@ const columns = [
         headerName: "Status",
         renderCell: (params) => (
             <Switch
+                color="success"
                 checked={Boolean(params.value)}
                 onClick={() =>
                     router.put(`/admin/products/${params.row.id}/status`, {
                         is_active: !params.row.is_active,
+                    })
+                }
+            />
+        ),
+    },
+    {
+        field: "is_featured",
+        headerName: "Featured",
+        renderCell: (params) => (
+            <Switch
+                color="success"
+                checked={Boolean(params.value)}
+                onClick={() =>
+                    router.put(`/admin/products/${params.row.id}/featured`, {
+                        is_featured: !params.row.is_featured,
                     })
                 }
             />

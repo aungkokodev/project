@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 
 class Category extends Model
 {
@@ -35,6 +36,14 @@ class Category extends Model
             $combined = uuid_create() . '-' . $category->name;
 
             $category->slug = substr(sha1($combined), 0, 16);
+        });
+
+        static::saved(function () {
+            Cache::forget('global_categories');
+        });
+
+        static::deleted(function () {
+            Cache::forget('global_categories');
         });
     }
 }

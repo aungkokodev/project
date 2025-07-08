@@ -29,7 +29,7 @@ function Edit({ category, categories }) {
             <div>
                 <FormFieldGroup
                     title={"Category Image"}
-                    className={"pe-5 pb-5"}
+                    className={"pr-5 pb-5"}
                 >
                     <FormImageInput
                         showImage={Boolean(data.image)}
