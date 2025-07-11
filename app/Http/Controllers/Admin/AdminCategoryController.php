@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -16,9 +17,19 @@ class AdminCategoryController extends Controller
         $categories = Category::with(['parent'])
             ->latest()
             ->get();
+        $total_count = Category::all()->count();
+        $main_count = Category::whereNull('parent_id')->count();
+        $sub_count = Category::whereNotNull('parent_id')->count();
+        $new_count = Category::where('created_at', '>=', Carbon::now()->subDays(30))->count();
 
         return Inertia::render('Admin/Category/Index', [
-            'categories' => $categories
+            'categories' => $categories,
+            'count' =>  [
+                'total' => $total_count,
+                'main' => $main_count,
+                'sub' => $sub_count,
+                'new' => $new_count
+            ]
         ]);
     }
 
@@ -39,7 +50,7 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'parent_id' => 'required|exists:categories,id',
+            'parent_id' => 'nullable|exists:categories,id',
             'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 

@@ -9,4 +9,9 @@ use Illuminate\Notifications\Notifiable;
 class OrderItem extends Model
 {
     use HasFactory, Notifiable;
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

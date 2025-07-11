@@ -1,9 +1,18 @@
 import EmptyDataGrid from "@/Components/EmptyDataGrid";
 import IconWithTooltip from "@/Components/IconWithTooltip";
 import LinkDataCell from "@/Components/LinkDataCell";
+import StatusCard from "@/Components/StatusCard";
 import Layout from "@/Layouts/Admin/Layout";
 import { router, usePage } from "@inertiajs/react";
-import { DeleteOutline, EditOutlined } from "@mui/icons-material";
+import {
+    AddOutlined,
+    CancelOutlined,
+    CheckCircleOutline,
+    DeleteOutline,
+    EditOutlined,
+    StarBorderOutlined,
+    StoreOutlined,
+} from "@mui/icons-material";
 import { Button, Switch } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect } from "react";
@@ -14,8 +23,6 @@ const columns = [
         field: "id",
         headerName: "#",
         width: 64,
-        renderCell: (params) =>
-            params.api.getAllRowIds().indexOf(params.id) + 1,
     },
     {
         field: "name",
@@ -59,7 +66,7 @@ const columns = [
     },
     {
         field: "is_active",
-        headerName: "Status",
+        headerName: "Active",
         renderCell: (params) => (
             <Switch
                 color="success"
@@ -86,6 +93,16 @@ const columns = [
                 }
             />
         ),
+    },
+    {
+        field: "created_at",
+        headerName: "Created",
+        valueFormatter: (v) =>
+            new Date(v).toLocaleDateString("en-UK", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            }),
     },
     {
         field: "actions",
@@ -116,20 +133,44 @@ const columns = [
     },
 ];
 
-function Index({ products }) {
+function Index({ products, count }) {
     const { flash } = usePage().props;
 
     useEffect(() => {
         if (toast.success) toast.success(flash.success);
     }, [flash.success]);
-
+    console.log(count);
     return (
         <>
-            <div className="flex gap-5 mb-5">
+            <div className="grid grid-cols-4 gap-5 mb-5">
+                <StatusCard
+                    title={"Total Products"}
+                    value={count["total"]}
+                    icon={<StoreOutlined />}
+                />
+                <StatusCard
+                    title={"Active Products"}
+                    value={count["active"]}
+                    icon={<CheckCircleOutline />}
+                />
+                <StatusCard
+                    title={"Featured Products"}
+                    value={count["featured"]}
+                    icon={<StarBorderOutlined />}
+                />
+                <StatusCard
+                    title={"Out of Stock"}
+                    value={count["empty"]}
+                    icon={<CancelOutlined />}
+                    color="red"
+                />
+            </div>
+            <div className="flex mb-5">
                 <Button
-                    className="px-5 py-2.5 rounded-lg bg-green-600 text-white ms-auto hover:bg-green-700"
+                    className="ms-auto rounded bg-green-600 text-white hover:bg-green-700"
                     onClick={() => router.visit("/admin/products/create")}
                 >
+                    <AddOutlined />
                     Add New Product
                 </Button>
             </div>

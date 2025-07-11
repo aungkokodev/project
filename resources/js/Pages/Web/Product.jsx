@@ -248,7 +248,7 @@ export default function ProductDetail() {
                                 className="bg-white p-6 rounded-lg shadow-sm"
                             >
                                 <div className="flex items-start">
-                                    <div className="flex-shrink-0">
+                                    <div className="shrink-0">
                                         <img
                                             src={
                                                 review.user.avatar ||

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Cart;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,6 +23,7 @@ class CartItemFactory extends Factory
             'cart_id' => Cart::factory(),
             'product_id' => Product::factory(),
             'quantity' => fake()->numberBetween(1, 5),
+            'created_at' => Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 60 * 24))
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Address;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,10 +19,8 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
-        $user = User::factory()->create();
-
         return [
-            'user_id' => $user,
+            'user_id' => User::factory(),
             'shipping_address_id' => Address::factory(),
             'billing_address_id' => Address::factory(),
             'order_number' => 'ORD-' . $this->faker->unique()->randomNumber(6),
@@ -29,6 +28,7 @@ class OrderFactory extends Factory
             'status' => $this->faker->randomElement(['pending', 'processing', 'completed', 'cancelled']),
             'payment_method' => $this->faker->randomElement(['cod', 'credit_card', 'bank_transfer']),
             'payment_status' => $this->faker->randomElement(['pending', 'paid', 'failed']),
+            'created_at' => Carbon::now()->subMinutes(rand(0, 60 * 24 * 360))
         ];
     }
 }

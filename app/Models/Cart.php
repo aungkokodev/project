@@ -9,4 +9,9 @@ use Illuminate\Notifications\Notifiable;
 class Cart extends Model
 {
     use HasFactory, Notifiable;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

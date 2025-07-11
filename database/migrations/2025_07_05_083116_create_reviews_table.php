@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->tinyInteger('rating')->unsigned()->between(1, 5);
             $table->text('comment')->nullable();
-            $table->boolean('is_active')->default(false);
+            $table->boolean('is_blocked')->default(false);
+            $table->boolean('is_flagged')->default(false);
             $table->timestamps();
         });
     }

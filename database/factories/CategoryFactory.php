@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +22,8 @@ class CategoryFactory extends Factory
             'slug' => fake()->slug(),
             'description' => fake()->sentence(),
             'image' => '/storage/categories/' . fake()->randomElement(['1', '2', '3']) . '.jpg',
-            'parent_id' => null
+            'parent_id' => null,
+            'created_at' => Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 60 * 24))
         ];
     }
 }

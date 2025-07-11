@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Category;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,8 +18,11 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
+
+        $category = Category::inRandomOrder()->first();
+
         return [
-            'category_id' => Category::factory(),
+            'category_id' => $category->id,
             'name' => fake()->words(3, true),
             'slug' => fake()->slug(),
             'description' => fake()->paragraph(),
@@ -27,6 +31,7 @@ class ProductFactory extends Factory
             'unit' => fake()->randomElement(['kg', 'liter', 'bag', 'package']),
             'is_featured' => fake()->boolean(),
             'is_active' => fake()->boolean(100),
+            'created_at' => Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 60 * 24))
         ];
     }
 }

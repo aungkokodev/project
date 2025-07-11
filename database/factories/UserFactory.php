@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -28,10 +29,11 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'role' => fake()->randomElement(['admin', 'customer']),
+            'role' => 'customer',
             'phone' => fake()->phoneNumber(),
             'avatar' => '/storage/users/' . fake()->randomElement(['1', '2', '3']) . '.jpg',
             'remember_token' => Str::random(10),
+            'created_at' => Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 60 * 24))
         ];
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -17,9 +18,21 @@ class AdminProductController extends Controller
         $products =  Product::with(['category', 'images'])
             ->latest()
             ->get();
+        $total_count = Product::all()->count();
+        $active_count = Product::where('is_active', '1')->count();
+        $featured_count = Product::where('is_featured', '1')->count();
+        $empty_count = Product::where('stock_quantity', '<', 1)->count();
+        $new_count =  Product::where('created_at', '>=', Carbon::now()->subDays(30))->count();
 
         return Inertia::render('Admin/Product/Index', [
-            'products' => $products
+            'products' => $products,
+            'count' => [
+                'total' => $total_count,
+                'active' => $active_count,
+                'featured' => $featured_count,
+                'empty' => $empty_count,
+                'new' => $new_count
+            ]
         ]);
     }
 

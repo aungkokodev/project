@@ -8,7 +8,7 @@ function Layout({ children, title }) {
     console.log("layout render");
 
     return (
-        <div className="w-screen h-dvh overflow-hidden grid grid-cols-[240px_1fr] bg-white text-slate-600">
+        <div className="w-screen h-dvh overflow-hidden grid grid-cols-[240px_1fr] bg-white text-slate-600 text-sm">
             <Head title={title} />
             <Sidebar />
             <div className="overflow-auto">

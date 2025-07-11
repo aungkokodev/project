@@ -1,9 +1,18 @@
 import EmptyDataGrid from "@/Components/EmptyDataGrid";
 import IconWithTooltip from "@/Components/IconWithTooltip";
 import LinkDataCell from "@/Components/LinkDataCell";
+import StatusCard from "@/Components/StatusCard";
 import Layout from "@/Layouts/Admin/Layout";
 import { router, usePage } from "@inertiajs/react";
-import { DeleteOutline, EditOutlined } from "@mui/icons-material";
+import {
+    AddOutlined,
+    CategoryOutlined,
+    DeleteOutline,
+    EditOutlined,
+    FiberNewOutlined,
+    LayersOutlined,
+    SubdirectoryArrowRightOutlined,
+} from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect } from "react";
@@ -74,7 +83,7 @@ const columns = [
     },
 ];
 
-function Index({ categories }) {
+function Index({ categories, count }) {
     const { flash } = usePage().props;
 
     useEffect(() => {
@@ -83,11 +92,34 @@ function Index({ categories }) {
 
     return (
         <>
-            <div className="flex gap-5 mb-5">
+            <div className="grid grid-cols-4 gap-5 mb-5">
+                <StatusCard
+                    title={"Total Categories"}
+                    value={count["total"]}
+                    icon={<CategoryOutlined />}
+                />
+                <StatusCard
+                    title={"Main Categories"}
+                    value={count["main"]}
+                    icon={<LayersOutlined />}
+                />
+                <StatusCard
+                    title={"Sub Categories"}
+                    value={count["sub"]}
+                    icon={<SubdirectoryArrowRightOutlined />}
+                />
+                <StatusCard
+                    title={"New Categories"}
+                    value={count["new"]}
+                    icon={<FiberNewOutlined />}
+                />
+            </div>
+            <div className="flex mb-5">
                 <Button
-                    className="px-5 py-2.5 rounded-lg bg-green-600 text-white ms-auto hover:bg-green-700"
+                    className="ms-auto rounded bg-green-600 text-white hover:bg-green-700"
                     onClick={() => router.visit("/admin/categories/create")}
                 >
+                    <AddOutlined />
                     Add New Category
                 </Button>
             </div>

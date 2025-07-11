@@ -11,7 +11,7 @@ function Topbar({ title }) {
             {title && (
                 <h1 className="font-bold text-lg w-40 truncate">{title}</h1>
             )}
-            <Breadcrumbs className="text-inherit text-sm mx-auto">
+            <Breadcrumbs className="text-inherit text-sm">
                 <Link href="/admin/dashboard" className="flex items-center">
                     <HomeOutlined fontSize="small" className="mr-1" />
                     <span>Home</span>

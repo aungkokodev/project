@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -46,12 +48,28 @@ class HandleInertiaRequests extends Middleware
             ],
             'categories' => function () {
                 return Cache::remember('global_categories', now()->addDay(), function () {
-                    return \App\Models\Category::with('children')
+                    return \App\Models\Category::with(['children'])
                         ->whereNull('parent_id')
-                        ->orderBy('name')
                         ->get();
                 });
             },
+            'backUrl' => url()->previous(),
+            'cart' => fn() => $this->getCartData($request),
         ];
+    }
+
+    protected function getCartData(Request $request)
+    {
+        if ($request->user()) {
+            return $request->user()->cartItems()->with('product.image')->get();
+        }
+
+        return collect($request->session()->get('cart', []))
+            ->map(function ($quantity, $productId) {
+                return [
+                    'product' => Product::with(['image'])->find($productId),
+                    'quantity' => $quantity
+                ];
+            })->values()->toArray();
     }
 }

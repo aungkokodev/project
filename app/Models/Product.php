@@ -27,6 +27,11 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function image()
+    {
+        return $this->hasOne(ProductImage::class)->where('is_default', 1);
+    }
+
     public function images()
     {
         return $this->hasMany(ProductImage::class);
@@ -37,6 +42,10 @@ class Product extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 
     protected static function booted()
     {

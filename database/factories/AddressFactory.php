@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -29,6 +30,7 @@ class AddressFactory extends Factory
             'postal_code' => $this->faker->postcode(),
             'country' => $this->faker->country(),
             'is_default' => false,
+            'created_at' => Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 60 * 24))
         ];
     }
 }

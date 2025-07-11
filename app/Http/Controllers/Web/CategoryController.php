@@ -3,63 +3,51 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $categories = Category::with(['children'])->whereNull('parent_id')->get();
+        $products = Product::with(['category', 'images', 'reviews'])->get();
+
+        return Inertia::render('Web/CategoryList',);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(string $slug)
     {
-        //
+        $category = Category::where('slug', $slug)->with(['children'])->firstOrFail();
+
+        $products = Product::with(['category', 'images', 'reviews'])
+            ->whereHas('category', function (Builder $query) use ($category) {
+                $categoryIds = $this->getAllDescendantIds($category);
+                $categoryIds[] = $category->id;
+
+                $query->whereIn('categories.id', $categoryIds);
+                $query->where('products.is_active', '1');
+            })
+            ->get();
+
+        return Inertia::render('Web/Category', [
+            'category' => $category,
+            'products' => $products
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    protected function getAllDescendantIds(Category $category)
     {
-        //
-    }
+        $ids = [];
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        foreach ($category->children as $child) {
+            $ids[] = $child->id;
+            $ids = array_merge($ids, $this->getAllDescendantIds($child));
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return $ids;
     }
 }

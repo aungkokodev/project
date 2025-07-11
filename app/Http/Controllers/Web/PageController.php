@@ -4,21 +4,22 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PageController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function login()
     {
-        //
+        return Inertia::render('Web/Login');
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function register()
     {
         //
     }
