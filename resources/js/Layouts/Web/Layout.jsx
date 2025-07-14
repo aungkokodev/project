@@ -1,15 +1,13 @@
 import Footer from "./Footer";
-import Header from "./Header";
-import Navbar from "./Navbar";
+import NavBar from "./NavBar";
+import TopBar from "./TopBar";
 
 function Layout({ children }) {
     return (
-        <div className="w-full min-h-dvh bg-white text-slate-600">
-            <Header />
-            <Navbar />
-            <main className="min-h-[calc(100vh-192px)] bg-neutral-50">
-                {children}
-            </main>
+        <div className="w-full min-h-dvh bg-white text-gray-600">
+            <TopBar />
+            <NavBar />
+            <main className="min-h-[calc(100vh-192px)]">{children}</main>
             <Footer />
         </div>
     );

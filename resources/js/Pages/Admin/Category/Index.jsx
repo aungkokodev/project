@@ -23,8 +23,6 @@ const columns = [
         field: "id",
         headerName: "#",
         width: 64,
-        renderCell: (params) =>
-            params.api.getAllRowIds().indexOf(params.id) + 1,
     },
     {
         field: "name",
@@ -52,13 +50,18 @@ const columns = [
     },
     { field: "description", headerName: "Description", flex: 1 },
     {
+        field: "created_at",
+        headerName: "Created At",
+        valueFormatter: (v) => new Date(v).toLocaleDateString("en-UK"),
+    },
+    {
         field: "actions",
         headerName: "Actions",
         renderCell: (params) => (
             <div className="flex gap-1 items-center justify-center">
                 <IconWithTooltip
                     icon={<EditOutlined />}
-                    title="edit"
+                    title="Edit"
                     color="green"
                     onClick={() =>
                         router.visit(
@@ -68,7 +71,7 @@ const columns = [
                 />
                 <IconWithTooltip
                     icon={<DeleteOutline />}
-                    title="delete"
+                    title="Delete"
                     color="red"
                     onClick={() => {
                         const yes = confirm(
@@ -88,7 +91,8 @@ function Index({ categories, count }) {
 
     useEffect(() => {
         if (toast.success) toast.success(flash.success);
-    }, [flash.success]);
+        if (toast.error) toast.error(flash.error);
+    });
 
     return (
         <>
@@ -129,9 +133,9 @@ function Index({ categories, count }) {
                 showToolbar
                 disableColumnMenu
                 sortingOrder={["asc", "desc"]}
-                pageSizeOptions={[6, 10, 25, 50, 100]}
+                pageSizeOptions={[10, 25, 50, 100]}
                 initialState={{
-                    pagination: { paginationModel: { page: 0, pageSize: 6 } },
+                    pagination: { paginationModel: { page: 0, pageSize: 10 } },
                 }}
                 slots={{ noRowsOverlay: EmptyDataGrid }}
                 className="text-inherit px-5 rounded-lg"

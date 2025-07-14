@@ -24,9 +24,11 @@ class ReviewFactory extends Factory
             'product_id' => Product::factory(),
             'rating' => fake()->numberBetween(1, 5),
             'comment' => fake()->paragraph(),
-            'is_blocked' => fake()->boolean(),
-            'is_flagged' => fake()->boolean(),
-            'created_at' => Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 60 * 24))
+            'is_approved' => fake()->boolean(),
+            'created_at' => Carbon::now()
+                ->subDays(rand(0, 90))
+                ->setHour(rand(0, 23))
+                ->setMinute(rand(0, 59))
         ];
     }
 }

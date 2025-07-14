@@ -4,7 +4,6 @@ import {
     CategoryOutlined,
     DashboardOutlined,
     GrassOutlined,
-    Inventory2Outlined,
     KeyboardArrowDownOutlined,
     KeyboardArrowRightOutlined,
     LeaderboardOutlined,
@@ -216,14 +215,14 @@ function getNavItems() {
             icon: <ListAltOutlined fontSize="small" />,
             children: [
                 {
-                    text: "Products",
-                    icon: <WidgetsOutlined fontSize="small" />,
-                    url: "/admin/products",
-                },
-                {
                     text: "Categories",
                     icon: <CategoryOutlined fontSize="small" />,
                     url: "/admin/categories",
+                },
+                {
+                    text: "Products",
+                    icon: <WidgetsOutlined fontSize="small" />,
+                    url: "/admin/products",
                 },
                 {
                     text: "Reviews",
@@ -238,14 +237,14 @@ function getNavItems() {
             ],
         },
         {
-            text: "Orders",
-            icon: <ShoppingCartOutlined fontSize="small" />,
-            url: "/admin/orders",
-        },
-        {
             text: "Customers",
             icon: <PersonOutline fontSize="small" />,
             url: "/admin/customers",
+        },
+        {
+            text: "Orders",
+            icon: <ShoppingCartOutlined fontSize="small" />,
+            url: "/admin/orders",
         },
         {
             text: "Reports",

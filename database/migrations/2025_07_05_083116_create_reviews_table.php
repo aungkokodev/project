@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->tinyInteger('rating')->unsigned()->between(1, 5);
+            $table->unsignedTinyInteger('rating')->numberBetween(1, 5);
             $table->text('comment')->nullable();
-            $table->boolean('is_blocked')->default(false);
-            $table->boolean('is_flagged')->default(false);
+            $table->boolean('is_approved')->default(false);
             $table->timestamps();
+            $table->unique(['user_id', 'product_id']);
         });
     }
 

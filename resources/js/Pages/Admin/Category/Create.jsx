@@ -1,13 +1,14 @@
-import FormFieldGroup from "@/Components/FormFieldGroup";
-import FormFieldWithLabel from "@/Components/FormFieldWithLabel";
-import FormImageInput from "@/Components/FormImageInput";
-import FormSelect from "@/Components/FormSelect";
+import FormFieldGroup from "@/Components/Input/FormFieldGroup";
+import FormFieldWithLabel from "@/Components/Input/FormFieldWithLabel";
+import FormImageInput from "@/Components/Input/FormImageInput";
+import Select from "@/Components/Input/Select";
+import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Admin/Layout";
-import { router, useForm } from "@inertiajs/react";
-import { Button, MenuItem, TextField } from "@mui/material";
+import { useForm } from "@inertiajs/react";
+import { Button, MenuItem } from "@mui/material";
 
 function Create({ categories }) {
-    const { data, setData, errors } = useForm({
+    const { data, setData, errors, setError, post } = useForm({
         name: "",
         description: "",
         parent_id: "",
@@ -15,7 +16,7 @@ function Create({ categories }) {
     });
 
     const handleSubmit = () => {
-        router.post("/admin/categories", data);
+        post("/admin/categories");
     };
 
     return (
@@ -29,7 +30,12 @@ function Create({ categories }) {
                         showImage={Boolean(data.image)}
                         src={data.image && URL.createObjectURL(data.image)}
                         onClose={() => setData("image", "")}
-                        onChange={(e) => setData("image", e.target.files[0])}
+                        onChange={(e) => {
+                            setData("image", e.target.files[0]);
+                            setError("image", "");
+                        }}
+                        error={!!errors.image}
+                        helperText={errors.image}
                     />
                 </FormFieldGroup>
             </div>
@@ -37,28 +43,32 @@ function Create({ categories }) {
                 <FormFieldGroup title={"Category Information"}>
                     <FormFieldWithLabel label={"Category Name"}>
                         <TextField
+                            required
                             size="small"
                             className="flex-1"
                             placeholder="Category Name"
-                            required
                             value={data.name}
                             onChange={(e) => setData("name", e.target.value)}
+                            error={!!errors.name}
+                            helperText={errors.name}
                         />
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Description"}>
                         <TextField
+                            required
                             size="small"
                             className="flex-1"
                             placeholder="Description"
-                            required
                             value={data.description}
                             onChange={(e) =>
                                 setData("description", e.target.value)
                             }
+                            error={!!errors.description}
+                            helperText={errors.description}
                         />
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Parent Category"}>
-                        <FormSelect
+                        <Select
                             size="small"
                             className="flex-1"
                             value={data.parent_id}
@@ -72,7 +82,7 @@ function Create({ categories }) {
                                     {category.name}
                                 </MenuItem>
                             ))}
-                        </FormSelect>
+                        </Select>
                     </FormFieldWithLabel>
                 </FormFieldGroup>
                 <Button

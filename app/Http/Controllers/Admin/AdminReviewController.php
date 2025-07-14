@@ -15,16 +15,16 @@ class AdminReviewController extends Controller
         $reviews = Review::with(['user', 'product.images'])->latest()->get();
         $total_count = Review::all()->count();
         $recent_count = Review::where('created_at', '>=', Carbon::now()->subDays(30))->count();
-        $flagged_count = Review::where('is_flagged', '1')->count();
-        $blocked_count = Review::where('is_blocked', '1')->count();
+        $pending_count = Review::where('is_approved', '0')->count();
+        $approved_count = Review::where('is_approved', '1')->count();
 
         return Inertia::render('Admin/Review/Index', [
             'reviews' => $reviews,
             'count' => [
                 'total' => $total_count,
                 'recent' => $recent_count,
-                'flagged' => $flagged_count,
-                'blocked' => $blocked_count,
+                'pending' => $pending_count,
+                'approved' => $approved_count,
             ]
         ]);
     }
@@ -34,17 +34,17 @@ class AdminReviewController extends Controller
         //
     }
 
-    public function blocked(Request $request, Review $review)
+    public function approved(Request $request, Review $review)
     {
         $review->update([
-            'is_blocked' => $request->is_blocked
+            'is_approved' => $request->is_approved
         ]);
     }
 
-    public function flagged(Request $request, Review $review)
-    {
-        $review->update([
-            'is_flagged' => $request->is_flagged
-        ]);
-    }
+    // public function flagged(Request $request, Review $review)
+    // {
+    //     $review->update([
+    //         'is_flagged' => $request->is_flagged
+    //     ]);
+    // }
 }

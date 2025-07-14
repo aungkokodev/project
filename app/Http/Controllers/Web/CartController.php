@@ -4,15 +4,23 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CartController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $cart = $this->getCartData($request);
+
+        return Inertia::render(
+            "Web/CartPage",
+            [
+                'cart' => $cart
+            ]
+        );
     }
 
     public function add(Request $request)
@@ -22,49 +30,120 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
-        if (Auth::guest()) {
-            $cart = session()->get('cart', []);
-            $cart[$validated['product_id']] = [
-                'quantity' => ($cart[$validated['product_id']]['quantity'] ?? 0) + $validated['quantity'],
-                'added_at' => now()
+        $this->handleCartOperation('add', $validated['product_id'], $validated['quantity']);
+
+        return back()->with('success', 'Item added to cart.');
+    }
+
+    public function update(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $this->handleCartOperation('update', $validated['product_id'], $validated['quantity']);
+
+        return back()->with('success', 'Cart updated.');
+    }
+
+    public function remove(Request $request)
+    {
+        $product_id = $request->product_id;
+
+        $this->handleCartOperation('remove', $product_id);
+
+        return back()->with('success', 'Item removed.');
+    }
+
+    protected function getCartData(Request $request)
+    {
+        if ($request->user()) {
+            $cart = $request->user()->cart()->with(['items.product.image', 'items.product.category'])->first();
+            return $cart?->items->map(function ($item) {
+                return [
+                    'product' => $item->product,
+                    'quantity' => $item->quantity,
+                ];
+            })->values()->toArray() ?? [];
+        }
+
+        return collect($request->session()->get('cart', []))->map(function ($data, $productId) {
+            return [
+                'product' => Product::with(['image', 'category'])->find($productId),
+                'quantity' => $data['quantity'] ?? 1,
             ];
-            session()->put('cart', $cart);
-        }
-        // For logged-in users
-        else {
-            Cart::updateOrCreate(
-                [
-                    'user_id' => Auth::user()->id,
-                    'product_id' => $validated['product_id']
-                ],
-                [
-                    'quantity' => DB::raw("quantity + {$validated['quantity']}")
-                ]
-            );
-        }
-
-        return back()->with('success', 'Item added to cart');
+        })->values()->toArray();
     }
 
-    protected function syncWithDatabase($user, $sessionCart)
+    protected function handleCartOperation(string $operation, $productId, $quantity = null)
     {
-        $user->cartItems()->delete();
-
-        foreach ($sessionCart as $productId => $quantity) {
-            $user->cartItems()->create([
-                'product_id' => $productId,
-                'quantity' => $quantity
-            ]);
+        if (Auth::check()) {
+            $this->handleDatabaseCart($operation, $productId, $quantity);
+        } else {
+            $this->handleSessionCart($operation, $productId, $quantity);
         }
     }
 
-    public function update(Request $request, string $id)
+    protected function handleDatabaseCart(string $operation, $productId, $quantity = null)
     {
-        //
+        $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
+
+        switch ($operation) {
+            case 'add':
+                $item = $cart->items()->firstOrNew(['product_id' => $productId]);
+                $item->quantity += $quantity;
+                $item->save();
+                break;
+
+            case 'update':
+                $item = $cart->items()->where('product_id', $productId)->first();
+                if ($item) {
+                    $item->quantity = $quantity;
+                    $item->save();
+                }
+                break;
+
+            case 'remove':
+                $cart->items()->where('product_id', $productId)->delete();
+                break;
+        }
     }
 
-    public function destroy(string $id)
+    protected function handleSessionCart(string $operation, $productId, $quantity = null)
     {
-        //
+        $cart = session()->get('cart', []);
+
+        switch ($operation) {
+            case 'add':
+                $cart[$productId] = [
+                    'quantity' => ($cart[$productId]['quantity'] ?? 0) + $quantity
+                ];
+                break;
+
+            case 'update':
+                if (isset($cart[$productId])) {
+                    $cart[$productId]['quantity'] = $quantity;
+                }
+                break;
+
+            case 'remove':
+                unset($cart[$productId]);
+                break;
+        }
+
+        session()->put('cart', $cart);
     }
+
+    // public function syncWithDatabase($user, $sessionCart)
+    // {
+    //     $user->cart()->items()->delete();
+
+    //     foreach ($sessionCart as $productId => $item) {
+    //         $user->cart()->items()->create([
+    //             'product_id' => $productId,
+    //             'quantity' => $item['quantity']
+    //         ]);
+    //     }
+    // }
 }

@@ -37,9 +37,19 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
     }
 
     public function orderItems()
@@ -50,9 +60,7 @@ class Product extends Model
     protected static function booted()
     {
         static::creating(function ($product) {
-
             $combined = uuid_create() . '-' . $product->name;
-
             $product->slug = substr(sha1($combined), 0, 16);
         });
     }

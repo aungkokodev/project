@@ -21,17 +21,19 @@ function Show({ category }) {
                     <TabPanel value={"details"} className="px-5 py-0">
                         <div className="flex py-5">
                             <p className="font-bold w-40">Category Name</p>
-                            <p>{category.name}</p>
+                            <p className="flex-1">{category.name}</p>
                         </div>
                         <Divider />
                         <div className="flex py-5">
                             <p className="font-bold w-40">Parent Category</p>
-                            <p>{category.parent?.name || "NULL"}</p>
+                            <p className="flex-1">
+                                {category.parent?.name || "NULL"}
+                            </p>
                         </div>
                         <Divider />
                         <div className="flex py-5">
                             <p className="font-bold w-40">Description</p>
-                            <p>{category.description}</p>
+                            <p className="flex-1">{category.description}</p>
                         </div>
                     </TabPanel>
                 </TabContext>

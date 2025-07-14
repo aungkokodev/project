@@ -23,7 +23,10 @@ class CartItemFactory extends Factory
             'cart_id' => Cart::factory(),
             'product_id' => Product::factory(),
             'quantity' => fake()->numberBetween(1, 5),
-            'created_at' => Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 60 * 24))
+            'created_at' => Carbon::now()
+                ->subDays(rand(0, 90))
+                ->setHour(rand(0, 23))
+                ->setMinute(rand(0, 59))
         ];
     }
 }

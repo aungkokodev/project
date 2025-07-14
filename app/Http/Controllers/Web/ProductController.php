@@ -4,25 +4,27 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
-        return redirect('categories.index');
-    }
-
     public function show(string $slug)
     {
-        $product = Product::where('slug', $slug)->with(['category', 'images', 'reviews.user'])->get()->first();
+        $product = Product::where('slug', $slug)
+            ->where('is_active', true)
+            ->with([
+                'category.parent',
+                'images',
+                'tags',
+                'reviews' => function ($query) {
+                    $query->where('reviews.is_approved', true);
+                },
+                'reviews.user'
+            ])
+            ->firstOrFail();
 
-        if (!$product) {
-            return Inertia::render("Web/NotFound");
-        }
-
-        return Inertia::render('Web/Product', [
+        return Inertia::render('Web/ProductPage', [
             'product' => $product
         ]);
     }

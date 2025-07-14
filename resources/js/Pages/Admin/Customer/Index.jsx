@@ -28,6 +28,12 @@ const columns = [
     },
     { field: "email", headerName: "Email", flex: 1 },
     { field: "phone", headerName: "Phone", flex: 1 },
+    {
+        field: "created_at",
+        headerName: "Created At",
+        valueGetter: (v) => new Date(v),
+        valueFormatter: (v) => v.toLocaleDateString("en-UK"),
+    },
     // {
     //     field: "product",
     //     headerName: "Product",
@@ -55,15 +61,15 @@ const columns = [
     //     headerName: "Comment",
     //     flex: 1,
     // },
-    {
-        field: "is_active",
-        headerName: "Active",
-        renderCell: (p) => (
-            <div className="flex h-full items-center">
-                <Switch checked={Boolean(!p.value)} color="success" />
-            </div>
-        ),
-    },
+    // {
+    //     field: "is_active",
+    //     headerName: "Active",
+    //     renderCell: (p) => (
+    //         <div className="flex h-full items-center">
+    //             <Switch checked={Boolean(!p.value)} color="success" />
+    //         </div>
+    //     ),
+    // },
     // {
     //     field: "actions",
     //     headerName: "Actions",
@@ -76,7 +82,6 @@ const columns = [
 ];
 
 function Index({ customers }) {
-    console.log(customers);
     return (
         <div>
             <DataGrid
@@ -84,9 +89,9 @@ function Index({ customers }) {
                 columns={columns}
                 showToolbar
                 disableColumnMenu
-                pageSizeOptions={[8, 10, 25, 50, 100]}
+                pageSizeOptions={[10, 25, 50, 100]}
                 initialState={{
-                    pagination: { paginationModel: { page: 0, pageSize: 8 } },
+                    pagination: { paginationModel: { page: 0, pageSize: 10 } },
                 }}
                 slots={{ noRowsOverlay: EmptyData }}
                 className="text-inherit px-4 rounded-lg"

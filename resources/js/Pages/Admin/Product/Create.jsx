@@ -1,15 +1,16 @@
-import FormFieldGroup from "@/Components/FormFieldGroup";
-import FormFieldWithLabel from "@/Components/FormFieldWithLabel";
-import FormImageInput from "@/Components/FormImageInput";
-import FormSelect from "@/Components/FormSelect";
+import FormFieldGroup from "@/Components/Input/FormFieldGroup";
+import FormFieldWithLabel from "@/Components/Input/FormFieldWithLabel";
+import FormImageInput from "@/Components/Input/FormImageInput";
+import Select from "@/Components/Input/Select";
+import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Admin/Layout";
-import { router, useForm } from "@inertiajs/react";
-import { Button, Divider, MenuItem, TextField } from "@mui/material";
+import { useForm } from "@inertiajs/react";
+import { Button, Divider, MenuItem } from "@mui/material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 function Create({ categories }) {
-    const { data, setData } = useForm({
+    const { data, setData, errors, setError, post } = useForm({
         name: "",
         category_id: "",
         unit: "",
@@ -20,7 +21,7 @@ function Create({ categories }) {
     });
 
     const handleSubmit = () => {
-        router.post("/admin/products", data);
+        post("/admin/products");
     };
 
     return (
@@ -37,9 +38,13 @@ function Create({ categories }) {
                             URL.createObjectURL(data.images[0])
                         }
                         onClose={() => setData("images[0]", "")}
-                        onChange={(e) =>
-                            setData("images[0]", e.target.files[0])
-                        }
+                        onChange={(e) => {
+                            setData("images[0]", e.target.files[0]);
+                            setError("images", "");
+                            setError("images.0", "");
+                        }}
+                        error={!!errors.images || !!errors["images.0"]}
+                        helperText={errors.images || errors["images.0"]}
                     />
                     <div className="grid grid-cols-3 gap-5">
                         <FormImageInput
@@ -49,9 +54,12 @@ function Create({ categories }) {
                                 URL.createObjectURL(data.images[1])
                             }
                             onClose={() => setData("images[1]", "")}
-                            onChange={(e) =>
-                                setData("images[1]", e.target.files[0])
-                            }
+                            onChange={(e) => {
+                                setData("images[1]", e.target.files[0]);
+                                setError("images.1", "");
+                            }}
+                            error={!!errors["images.1"]}
+                            helperText={errors["images.1"]}
                         />
                         <FormImageInput
                             showImage={Boolean(data.images[2])}
@@ -60,9 +68,12 @@ function Create({ categories }) {
                                 URL.createObjectURL(data.images[2])
                             }
                             onClose={() => setData("images[2]", "")}
-                            onChange={(e) =>
-                                setData("images[2]", e.target.files[0])
-                            }
+                            onChange={(e) => {
+                                setData("images[2]", e.target.files[0]);
+                                setError("images.2", "");
+                            }}
+                            error={!!errors["images.2"]}
+                            helperText={errors["images.2"]}
                         />
                         <FormImageInput
                             showImage={Boolean(data.images[3])}
@@ -71,9 +82,12 @@ function Create({ categories }) {
                                 URL.createObjectURL(data.images[3])
                             }
                             onClose={() => setData("images[3]", "")}
-                            onChange={(e) =>
-                                setData("images[3]", e.target.files[0])
-                            }
+                            onChange={(e) => {
+                                setData("images[3]", e.target.files[0]);
+                                setError("images.3", "");
+                            }}
+                            error={!!errors["images.3"]}
+                            helperText={errors["images.3"]}
                         />
                     </div>
                 </FormFieldGroup>
@@ -83,6 +97,8 @@ function Create({ categories }) {
                 <FormFieldGroup title={"Product Information"}>
                     <FormFieldWithLabel label={"Product Name"}>
                         <TextField
+                            error={!!errors.name}
+                            helperText={errors.name}
                             size="small"
                             className="flex-1"
                             placeholder="Product Name"
@@ -92,7 +108,9 @@ function Create({ categories }) {
                         />
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Category"}>
-                        <FormSelect
+                        <Select
+                            error={!!errors.category_id}
+                            helperText={errors.category_id}
                             size="small"
                             className="flex-1"
                             value={data.category_id}
@@ -115,10 +133,12 @@ function Create({ categories }) {
                                 )),
                                 <Divider />,
                             ])}
-                        </FormSelect>
+                        </Select>
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Unit"}>
                         <TextField
+                            error={!!errors.unit}
+                            helperText={errors.unit}
                             size="small"
                             className="flex-1"
                             placeholder="Unit (eg. kg, L, package, bag)"
@@ -132,6 +152,8 @@ function Create({ categories }) {
                 <FormFieldGroup title={"Product Price + Stock"}>
                     <FormFieldWithLabel label={"Price"}>
                         <TextField
+                            error={!!errors.price}
+                            helperText={errors.price}
                             size="small"
                             className="flex-1"
                             placeholder="0"
@@ -143,6 +165,8 @@ function Create({ categories }) {
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Quantity"}>
                         <TextField
+                            error={!!errors.stock_quantity}
+                            helperText={errors.stock_quantity}
                             size="small"
                             className="flex-1"
                             placeholder="0"

@@ -35,20 +35,20 @@ return Application::configure(basePath: dirname(__DIR__))
                 $status = $e->getStatusCode();
             }
 
-            // if (in_array($status, [401, 403, 404, 419, 429, 500, 503])) {
-            return Inertia::render("Errors/Error", [
-                'status' => $status,
-                'message' => $e->getMessage(),
-                'categories' => function () {
-                    return Cache::remember('global_categories', now()->addDay(), function () {
-                        return \App\Models\Category::with(['children'])
-                            ->whereNull('parent_id')
-                            ->get();
-                    });
-                },
-                'backUrl' => url()->previous()
-            ])->toResponse($request)->setStatusCode($status);
-            // }
+            if (in_array($status, [401, 403, 404, 419, 429, 503])) {
+                return Inertia::render("Errors/Error", [
+                    'status' => $status,
+                    'message' => $e->getMessage(),
+                    'categories' => function () {
+                        return Cache::remember('global_categories', now()->addDay(), function () {
+                            return \App\Models\Category::with(['children'])
+                                ->whereNull('parent_id')
+                                ->get();
+                        });
+                    },
+                    'backUrl' => url()->previous()
+                ])->toResponse($request)->setStatusCode($status);
+            }
             return null;
         });
     })->create();

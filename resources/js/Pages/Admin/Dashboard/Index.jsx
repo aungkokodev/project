@@ -80,7 +80,7 @@ function Index({ sales, orders, customers, products }) {
                 />
             </div>
 
-            <div className="grid grid-cols-2 gap-5">
+            {/* <div className="grid grid-cols-2 gap-5">
                 <StatusCardWithGraphs
                     type="line"
                     id={"total-sale"}
@@ -105,7 +105,7 @@ function Index({ sales, orders, customers, products }) {
                         products[timeRange].daily,
                     ]}
                 />
-            </div>
+            </div> */}
             <div className="flex gap-5 items-center ms-auto absolute right-10 top-3 z-50">
                 <Select
                     value={timeRange}

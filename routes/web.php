@@ -1,67 +1,76 @@
 <?php
 
-use App\Http\Controllers\Web\CartController;
-use App\Http\Controllers\Web\CategoryController;
-use App\Http\Controllers\Web\HomeController;
-use App\Http\Controllers\Web\PageController;
-use App\Http\Controllers\Web\ProductController;
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\Web\{
+  HomeController,
+  CategoryController,
+  ProductController,
+  CartController,
+  WishlistController,
+  ProfileContorller,
+  ReviewController,
+  PageController
+};
 
 use App\Http\Controllers\Admin\{
   AdminDashboardController,
-  AdminProfileController,
-  AdminProductController,
   AdminCategoryController,
+  AdminProductController,
+  AdminReviewController,
+  AdminCustomerController,
+  AdminProfileController,
   AdminOrderController,
   AdminOrderItemController,
-  AdminCustomerController,
-  AdminReviewController,
   AdminReportController,
-  AdminSettingController,
-  AdminPaymentSettingController,
   AdminDiscountController,
 };
 
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/products/{product:slug}', [ProductController::class, 'show']);
 
-Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/collections', [CategoryController::class, 'index']);
+Route::get('/collections/{category:slug}', [CategoryController::class, 'index']);
 
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart', [CartController::class, 'add'])->name('cart.add');
+Route::get('/cart', [CartController::class, 'index']);
+Route::post('/cart/add', [CartController::class, 'add']);
+Route::post('/cart/update', [CartController::class, 'update']);
+Route::post('/cart/remove', [CartController::class, 'remove']);
 
-Route::get('/whishlist', [CartController::class, 'index'])->name('whishlist.index');
-Route::post('/whishlist', [CartController::class, 'store'])->name('whishlist.store');
+Route::get('/wishlist', [WishlistController::class, 'index']);
+Route::post('/wishlist/add', [WishlistController::class, 'add']);
+Route::post('/wishlist/toggle', [WishlistController::class, 'toggle']);
+Route::post('/wishlist/remove', [WishlistController::class, 'remove']);
 
-Route::get('/l', [PageController::class, 'login'])->name('pages.login');
-Route::get('/about', [PageController::class, 'about'])->name('pages.about');
-Route::get('/contact', [PageController::class, 'contact'])->name('pages.contact');
+Route::post('/reviews', [ReviewController::class, 'store']);
+
+Route::get('/about', [PageController::class, 'about']);
+Route::get('/contact', [PageController::class, 'contact']);
 
 
 Route::middleware(['auth', 'role:customer'])->name('user.')->group(function () {
-  Route::get('/profile', function () {
-    return "user profile";
-  })->name('profile');
+  Route::get('/profile', [ProfileContorller::class, 'index'])->name('profile');
 });
+
 
 Route::prefix('/admin')->middleware(['auth', 'role:admin'])->name('admin.')->group(function () {
   Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-  //
   Route::resource('categories', AdminCategoryController::class);
+  Route::post('categories/{category}', [AdminCategoryController::class, 'update']);
 
-  //
   Route::resource('products', AdminProductController::class);
+  Route::post('products/{product}', [AdminProductController::class, 'update']);
   Route::put('products/{product}/status', [AdminProductController::class, 'status'])->name('products.status');
   Route::put('products/{product}/featured', [AdminProductController::class, 'featured'])->name('products.featured');
 
-  // 
   Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
-  Route::put('reviews/{review}/blocked', [AdminReviewController::class, 'blocked'])->name('reviews.blocked');
+  Route::put('reviews/{review}/approved', [AdminReviewController::class, 'approved'])->name('reviews.approved');
   Route::put('reviews/{review}/flagged', [AdminReviewController::class, 'flagged'])->name('reviews.flagged');
+
+
 
   Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
   Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
@@ -90,13 +99,6 @@ Route::prefix('/admin')->middleware(['auth', 'role:admin'])->name('admin.')->gro
     ->name('reports.customers');
   Route::get('reports/export/sales', [AdminReportController::class, 'exportSales'])
     ->name('reports.export.sales');
-
-  Route::get('settings', [AdminSettingController::class, 'edit'])->name('settings.edit');
-  Route::put('settings', [AdminSettingController::class, 'update'])->name('settings.update');
-  Route::get('settings/payments', [AdminPaymentSettingController::class, 'index'])
-    ->name('settings.payments');
-  Route::put('settings/payments', [AdminPaymentSettingController::class, 'update'])
-    ->name('settings.payments.update');
 });
 
 require __DIR__ . '/auth.php';

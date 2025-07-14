@@ -55,21 +55,37 @@ class HandleInertiaRequests extends Middleware
             },
             'backUrl' => url()->previous(),
             'cart' => fn() => $this->getCartData($request),
+            'wishlistCount' => fn() =>  $this->getWishlistCount($request)
+
         ];
+    }
+
+    protected function getWishlistCount()
+    {
+        return  Auth::check()
+            ? Auth::user()->wishlist()->with('image')->get()->count()
+            : collect(session('wishlist', []))->map(function ($id) {
+                return Product::with('image')->find($id);
+            })->count();
     }
 
     protected function getCartData(Request $request)
     {
         if ($request->user()) {
-            return $request->user()->cartItems()->with('product.image')->get();
+            $cart = $request->user()->cart()->with('items.product.image')->first();
+            return $cart?->items->map(function ($item) {
+                return [
+                    'product' => $item->product,
+                    'quantity' => $item->quantity,
+                ];
+            })->values()->toArray() ?? [];
         }
 
-        return collect($request->session()->get('cart', []))
-            ->map(function ($quantity, $productId) {
-                return [
-                    'product' => Product::with(['image'])->find($productId),
-                    'quantity' => $quantity
-                ];
-            })->values()->toArray();
+        return collect($request->session()->get('cart', []))->map(function ($data, $productId) {
+            return [
+                'product' => Product::with('image')->find($productId),
+                'quantity' => $data['quantity'] ?? 1,
+            ];
+        })->values()->toArray();
     }
 }

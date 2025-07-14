@@ -1,5 +1,5 @@
 import Layout from "@/Layouts/Web/Layout";
-import { Head, Link, router, usePage, useRemember } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 
 export default function Error({ status, message }) {
     const errorMessages = {
@@ -26,8 +26,7 @@ export default function Error({ status, message }) {
                 <h2 className="text-2xl font-semibold text-center mb-6">
                     {title}
                 </h2>
-                url
-                <p className="text-gray-600 mb-8 text-center">{description}</p>
+                {/* <p className="text-gray-600 mb-8 text-center">{description}</p> */}
                 <div className="text-center">
                     <button
                         onClick={() => router.get(page.props.backUrl)}

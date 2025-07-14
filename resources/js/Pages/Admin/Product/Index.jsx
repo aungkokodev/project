@@ -51,33 +51,20 @@ const columns = [
     {
         field: "price",
         headerName: "Price",
+        valueGetter: (v) => parseInt(v),
         valueFormatter: (v) => new Intl.NumberFormat().format(v),
         align: "right",
     },
     {
         field: "stock_quantity",
         headerName: "Quantity",
+        valueGetter: (v) => parseInt(v),
         valueFormatter: (v) => new Intl.NumberFormat().format(v),
         align: "right",
     },
     {
         field: "unit",
         headerName: "Unit",
-    },
-    {
-        field: "is_active",
-        headerName: "Active",
-        renderCell: (params) => (
-            <Switch
-                color="success"
-                checked={Boolean(params.value)}
-                onClick={() =>
-                    router.put(`/admin/products/${params.row.id}/status`, {
-                        is_active: !params.row.is_active,
-                    })
-                }
-            />
-        ),
     },
     {
         field: "is_featured",
@@ -95,14 +82,25 @@ const columns = [
         ),
     },
     {
+        field: "is_active",
+        headerName: "Active",
+        renderCell: (params) => (
+            <Switch
+                color="success"
+                checked={Boolean(params.value)}
+                onClick={() =>
+                    router.put(`/admin/products/${params.row.id}/status`, {
+                        is_active: !params.row.is_active,
+                    })
+                }
+            />
+        ),
+    },
+    {
         field: "created_at",
         headerName: "Created",
-        valueFormatter: (v) =>
-            new Date(v).toLocaleDateString("en-UK", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-            }),
+        valueGetter: (v) => new Date(v),
+        valueFormatter: (v) => v.toLocaleDateString("en-UK"),
     },
     {
         field: "actions",
@@ -111,13 +109,13 @@ const columns = [
             <div className="flex gap-1 items-center justify-center">
                 <IconWithTooltip
                     icon={<EditOutlined />}
-                    title="edit"
+                    title="Edit"
                     color="green"
                     onClick={() =>
                         router.visit(`/admin/products/${params.row.slug}/edit`)
                     }
                 />
-                <IconWithTooltip
+                {/* <IconWithTooltip
                     icon={<DeleteOutline />}
                     title="delete"
                     color="red"
@@ -127,7 +125,7 @@ const columns = [
                         );
                         if (yes) router.delete(`/admin/products/${params.id}`);
                     }}
-                />
+                /> */}
             </div>
         ),
     },
@@ -138,8 +136,9 @@ function Index({ products, count }) {
 
     useEffect(() => {
         if (toast.success) toast.success(flash.success);
-    }, [flash.success]);
-    console.log(count);
+        if (toast.error) toast.error(flash.error);
+    });
+
     return (
         <>
             <div className="grid grid-cols-4 gap-5 mb-5">
@@ -180,9 +179,9 @@ function Index({ products, count }) {
                 showToolbar
                 disableColumnMenu
                 sortingOrder={["asc", "desc"]}
-                pageSizeOptions={[6, 10, 25, 50, 100]}
+                pageSizeOptions={[10, 25, 50, 100]}
                 initialState={{
-                    pagination: { paginationModel: { page: 0, pageSize: 6 } },
+                    pagination: { paginationModel: { page: 0, pageSize: 10 } },
                 }}
                 slots={{ noRowsOverlay: EmptyDataGrid }}
                 className="text-inherit px-5 rounded-lg"

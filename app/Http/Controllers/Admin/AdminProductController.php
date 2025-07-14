@@ -18,6 +18,7 @@ class AdminProductController extends Controller
         $products =  Product::with(['category', 'images'])
             ->latest()
             ->get();
+
         $total_count = Product::all()->count();
         $active_count = Product::where('is_active', '1')->count();
         $featured_count = Product::where('is_featured', '1')->count();
@@ -59,7 +60,7 @@ class AdminProductController extends Controller
                 'unit' => 'required|string',
                 'price' => 'required|numeric',
                 'stock_quantity' => 'required|numeric',
-                'images' => 'required|array|min:1|max:4',
+                'images' => 'required|array|size:4',
                 'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
             ]);
 
@@ -96,8 +97,7 @@ class AdminProductController extends Controller
     public function edit(string $slug)
     {
         $product = Product::where('slug', $slug)
-            ->with(['category', 'images'])
-            ->get()
+            ->with(['category', 'images' => fn($q) => $q->orderByDesc('is_default'),])
             ->first();
 
         $categories = Category::whereNull('parent_id')
@@ -121,6 +121,8 @@ class AdminProductController extends Controller
             'price' => 'required|numeric',
             'stock_quantity' => 'required|numeric',
             'defaultImage' => 'required',
+            'additionalImages' => 'required|array|size:3',
+            'additionalImages.*' => 'required',
             'existing_additionalImages' => 'array',
             'existing_additionalImages.*' => 'string',
             'new_additionalImages' => 'array',

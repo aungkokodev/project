@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number')->unique();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('total_amount', 10, 0);
-            $table->enum('status', ['pending', 'shipped', 'delivered', 'cancelled'])->default('pending');
-            $table->enum('payment_method', ['cod', 'credit_card', 'bank_transfer']);
-            $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
-            $table->foreignId('shipping_address_id')->constrained('addresses', 'id');
-            $table->foreignId('billing_address_id')->constrained('addresses', 'id');
+            $table->enum('status', ['pending', 'shipped', 'delivered', 'cancelled', 'refunded'])->default('pending');
+            $table->enum('payment_method', ['cod', 'credit_card', 'bank_transfer', 'digital_wallet']);
+            $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
+            $table->foreignId('shipping_address_id')->constrained('addresses')->restrictOnDelete();
+            $table->foreignId('billing_address_id')->constrained('addresses')->restrictOnDelete();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

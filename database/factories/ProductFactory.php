@@ -26,12 +26,15 @@ class ProductFactory extends Factory
             'name' => fake()->words(3, true),
             'slug' => fake()->slug(),
             'description' => fake()->paragraph(),
-            'price' => fake()->numberBetween(1000, 10000),
+            'price' => fake()->numberBetween(30000, 50000),
             'stock_quantity' => fake()->numberBetween(0, 100),
             'unit' => fake()->randomElement(['kg', 'liter', 'bag', 'package']),
             'is_featured' => fake()->boolean(),
             'is_active' => fake()->boolean(100),
-            'created_at' => Carbon::now()->subDays(rand(0, 365))->subMinutes(rand(0, 60 * 24))
+            'created_at' => Carbon::now()
+                ->subDays(rand(0, 90))
+                ->setHour(rand(0, 23))
+                ->setMinute(rand(0, 59))
         ];
     }
 }

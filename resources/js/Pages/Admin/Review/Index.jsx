@@ -4,10 +4,10 @@ import StatusCard from "@/Components/StatusCard";
 import Layout from "@/Layouts/Admin/Layout";
 import { router, usePage } from "@inertiajs/react";
 import {
-    BlockOutlined,
+    CheckCircleOutline,
     FiberNewOutlined,
-    FlagOutlined,
     RateReviewOutlined,
+    TimelapseOutlined,
 } from "@mui/icons-material";
 import { Rating, Switch } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -27,8 +27,8 @@ const columns = [
         renderCell: ({ row }) => (
             <LinkDataCell
                 text={row.user.name}
-                url={`/admin/users/${row.user.id}`}
-                avatar={row.user.avatar}
+                // url={`/admin/users/${row.user.id}`}
+                avatar={row.user?.avatar || "no avatar"}
                 avatarVariant="circle"
             />
         ),
@@ -64,30 +64,20 @@ const columns = [
         flex: 1,
     },
     {
-        field: "is_flagged",
-        headerName: "Flagged",
-        renderCell: ({ row, value }) => (
-            <Switch
-                color="success"
-                checked={Boolean(value)}
-                onClick={() =>
-                    router.put(`/admin/reviews/${row.id}/flagged`, {
-                        is_flagged: !row.is_flagged,
-                    })
-                }
-            />
-        ),
+        field: "created_at",
+        headerName: "Review At",
+        valueFormatter: (v) => new Date(v).toLocaleDateString("en-UK"),
     },
     {
-        field: "is_blocked",
-        headerName: "Blocked",
+        field: "is_approved",
+        headerName: "Approved",
         renderCell: ({ row, value }) => (
             <Switch
                 color="success"
                 checked={Boolean(value)}
                 onClick={() =>
-                    router.put(`/admin/reviews/${row.id}/blocked`, {
-                        is_blocked: !row.is_blocked,
+                    router.put(`/admin/reviews/${row.id}/approved`, {
+                        is_approved: !row.is_approved,
                     })
                 }
             />
@@ -100,7 +90,7 @@ function Index({ reviews, count }) {
 
     useEffect(() => {
         if (toast.success) toast.success(flash.success);
-    }, [flash.success]);
+    });
 
     return (
         <>
@@ -116,14 +106,14 @@ function Index({ reviews, count }) {
                     icon={<FiberNewOutlined />}
                 />
                 <StatusCard
-                    title={"Flagged"}
-                    value={count["flagged"]}
-                    icon={<FlagOutlined />}
+                    title={"Pending"}
+                    value={count["pending"]}
+                    icon={<TimelapseOutlined />}
                 />
                 <StatusCard
-                    title={"Blocked"}
-                    value={count["blocked"]}
-                    icon={<BlockOutlined />}
+                    title={"Approved"}
+                    value={count["approved"]}
+                    icon={<CheckCircleOutline />}
                 />
             </div>
             <DataGrid

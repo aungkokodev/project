@@ -18,7 +18,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Web/Login', [
+        return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
         ]);
@@ -36,12 +36,12 @@ class AuthenticatedSessionController extends Controller
         $role = Auth::user()->role;
 
         if ($role === 'admin') {
-            $route = 'admin.dashboard';
+            $route = '/admin/dashboard';
         } else if ($role === 'customer') {
-            $route = 'user.profile';
+            $route = '/profile';
         }
 
-        return redirect(route($route, absolute: false));
+        return redirect($route);
     }
 
     /**
@@ -50,6 +50,8 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
+
+        session()->forget('cart');
 
         $request->session()->invalidate();
 

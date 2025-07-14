@@ -1,28 +1,26 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import PrimaryButton from "@/Components/Button/PrimaryButton";
+import TextField from "@/Components/Input/TextField";
+import Layout from "@/Layouts/Web/Layout";
+import { Head, Link, useForm } from "@inertiajs/react";
+import { Checkbox } from "@mui/material";
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
+        email: "",
+        password: "",
         remember: false,
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('login'), {
-            onFinish: () => reset('password'),
+        post(route("login"), {
+            onFinish: () => reset("password"),
         });
     };
 
     return (
-        <GuestLayout>
+        <div className="h-[calc(100vh-192px)] flex items-center justify-center p-5">
             <Head title="Log in" />
 
             {status && (
@@ -31,70 +29,72 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+            <form onSubmit={submit} className="w-xs mx-auto space-y-5">
+                <h2 className="font-bold text-2xl text-center text-slate-800">
+                    LOGIN
+                </h2>
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
+                <TextField
+                    required
+                    id="email"
+                    type="email"
+                    name="email"
+                    label="Email"
+                    className="w-full"
+                    value={data.email}
+                    onChange={(e) => setData("email", e.target.value)}
+                    helperText={errors.email}
+                    error={errors.email}
+                    autoFocus={true}
+                />
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
+                <TextField
+                    required
+                    id="password"
+                    type="password"
+                    name="password"
+                    label="Password"
+                    className="w-full"
+                    value={data.password}
+                    onChange={(e) => setData("password", e.target.value)}
+                    helperText={errors.password}
+                    error={errors.password}
+                />
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4 block">
+                <div className="flex items-center justify-between text-sm">
                     <label className="flex items-center">
                         <Checkbox
                             name="remember"
                             checked={data.remember}
                             onChange={(e) =>
-                                setData('remember', e.target.checked)
+                                setData("remember", e.target.checked)
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
+                        <span>Remember me</span>
                     </label>
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
+                    {/* {canResetPassword && (
                         <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            href={route("password.request")}
+                            className="rounded-md text-sm underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
                             Forgot your password?
                         </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
+                    )} */}
                 </div>
+
+                <PrimaryButton className="w-full py-3.5" disabled={processing}>
+                    Log in
+                </PrimaryButton>
+
+                <p className="text-sm text-center">
+                    Not a member?{" "}
+                    <Link href={route("register")} className="underline">
+                        Sign up now
+                    </Link>
+                </p>
             </form>
-        </GuestLayout>
+        </div>
     );
 }
+
+Login.layout = (page) => <Layout children={page} />;

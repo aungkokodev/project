@@ -1,45 +1,72 @@
-import FormFieldGroup from "@/Components/FormFieldGroup";
-import FormFieldWithLabel from "@/Components/FormFieldWithLabel";
-import FormImageInput from "@/Components/FormImageInput";
-import FormSelect from "@/Components/FormSelect";
+import FormFieldGroup from "@/Components/Input/FormFieldGroup";
+import FormFieldWithLabel from "@/Components/Input/FormFieldWithLabel";
+import FormImageInput from "@/Components/Input/FormImageInput";
+import Select from "@/Components/Input/Select";
+import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Admin/Layout";
-import { router, useForm } from "@inertiajs/react";
-import { Button, Divider, MenuItem, TextField } from "@mui/material";
+import { useForm } from "@inertiajs/react";
+import { Button, Divider, MenuItem } from "@mui/material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 function Edit({ product, categories }) {
-    const { data, setData } = useForm({
+    const { data, setData, errors, setError, post } = useForm({
         name: product.name || "",
         category_id: product.category_id || "",
         unit: product.unit || "",
-        price: product.price || "",
-        stock_quantity: product.stock_quantity || "",
+        price: product.price || 0,
+        stock_quantity: product.stock_quantity || 0,
         defaultImage: product.images?.[0]?.path || "",
-        additionalImages: product.images?.splice(1).map((v) => v?.path) || [],
+        additionalImages: product.images?.slice(1).map((v) => v?.path) || [],
         description: product.description || "",
+        new_additionalImages: [],
+        existing_additionalImages:
+            product.images?.slice(1).map((v) => v?.path) || [],
     });
 
-    const handleSubmit = () => {
-        const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("category_id", data.category_id);
-        formData.append("unit", data.unit);
-        formData.append("price", data.price);
-        formData.append("stock_quantity", data.stock_quantity);
-        formData.append("description", data.description);
-        formData.append("defaultImage", data.defaultImage);
-        formData.append("_method", "PUT");
+    const handleImageChange = (images) => {
+        let oldData = [];
+        let newData = [];
 
-        data.additionalImages.forEach((img, i) => {
+        setData("existing_additionalImages", []);
+        setData("new_additionalImages", []);
+
+        images.forEach((img, i) => {
             if (img instanceof File) {
-                formData.append(`new_additionalImages[]`, img);
+                newData.push(img);
             } else {
-                formData.append(`existing_additionalImages[]`, img);
+                oldData.push(img);
             }
         });
 
-        router.post(`/admin/products/${product.id}`, formData);
+        setData("existing_additionalImages", oldData);
+        setData("new_additionalImages", newData);
+    };
+
+    const handleSubmit = () => {
+        // const formData = new FormData();
+        // formData.append("name", data.name);
+        // formData.append("category_id", data.category_id);
+        // formData.append("unit", data.unit);
+        // formData.append("price", data.price);
+        // formData.append("stock_quantity", data.stock_quantity);
+        // formData.append("description", data.description);
+        // formData.append("defaultImage", data.defaultImage);
+        // formData.append("_method", "PUT");
+
+        // data.additionalImages.forEach((img, i) => {
+        //     if (img instanceof File) {
+        //         formData.append(`new_additionalImages[]`, img);
+        //     } else {
+        //         formData.append(`existing_additionalImages[]`, img);
+        //     }
+        // });
+
+        // router.post(`/admin/products/${product.id}`, formData);
+
+        // handleImageChange(data.additionalImages);
+
+        post(`/admin/products/${product.id}`);
     };
 
     return (
@@ -50,6 +77,8 @@ function Edit({ product, categories }) {
                     className={"pr-5 pb-5"}
                 >
                     <FormImageInput
+                        error={!!errors.defaultImage}
+                        helperText={errors.defaultImage}
                         showImage={Boolean(data.defaultImage)}
                         src={
                             data.defaultImage &&
@@ -64,6 +93,8 @@ function Edit({ product, categories }) {
                     />
                     <div className="grid grid-cols-3 gap-5">
                         <FormImageInput
+                            error={!!errors["additionalImages.0"]}
+                            helperText={errors["additionalImages.0"]}
                             showImage={Boolean(data.additionalImages[0])}
                             src={
                                 data.additionalImages[0] &&
@@ -74,14 +105,20 @@ function Edit({ product, categories }) {
                                       ))
                             }
                             onClose={() => setData("additionalImages[0]", null)}
-                            onChange={(e) =>
+                            onChange={(e) => {
                                 setData(
                                     "additionalImages[0]",
                                     e.target.files[0]
-                                )
-                            }
+                                );
+                                setError("additionalImages.0", "");
+                                let images = data.additionalImages;
+                                images[0] = e.target.files[0];
+                                handleImageChange(images);
+                            }}
                         />
                         <FormImageInput
+                            error={!!errors["additionalImages.1"]}
+                            helperText={errors["additionalImages.1"]}
                             showImage={Boolean(data.additionalImages[1])}
                             src={
                                 data.additionalImages[1] &&
@@ -92,14 +129,21 @@ function Edit({ product, categories }) {
                                       ))
                             }
                             onClose={() => setData("additionalImages[1]", "")}
-                            onChange={(e) =>
+                            onChange={(e) => {
                                 setData(
                                     "additionalImages[1]",
                                     e.target.files[0]
-                                )
-                            }
+                                );
+                                setError("additionalImages.1", "");
+                                let images = data.additionalImages;
+                                images[1] = e.target.files[0];
+                                handleImageChange(images);
+                                handleImageChange(images);
+                            }}
                         />
                         <FormImageInput
+                            error={!!errors["additionalImages.2"]}
+                            helperText={errors["additionalImages.2"]}
                             showImage={Boolean(data.additionalImages[2])}
                             src={
                                 data.additionalImages[2] &&
@@ -110,13 +154,21 @@ function Edit({ product, categories }) {
                                       ))
                             }
                             onClose={() => setData("additionalImages[2]", "")}
-                            onChange={(e) =>
+                            onChange={(e) => {
                                 setData(
                                     "additionalImages[2]",
                                     e.target.files[0]
-                                )
-                            }
+                                );
+                                setError("additionalImages.2", "");
+                                let images = data.additionalImages;
+                                images[2] = e.target.files[0];
+                                handleImageChange(images);
+                                handleImageChange(images);
+                            }}
                         />
+                    </div>
+                    <div className="text-red-800">
+                        {errors.additionalImages && errors.additionalImages}
                     </div>
                 </FormFieldGroup>
             </div>
@@ -124,6 +176,8 @@ function Edit({ product, categories }) {
                 <FormFieldGroup title={"Product Information"}>
                     <FormFieldWithLabel label={"Product Name"}>
                         <TextField
+                            error={!!errors.name}
+                            helperText={errors.name}
                             size="small"
                             className="flex-1"
                             placeholder="Product Name"
@@ -133,7 +187,9 @@ function Edit({ product, categories }) {
                         />
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Category"}>
-                        <FormSelect
+                        <Select
+                            error={!!errors.category_id}
+                            helperText={errors.category_id}
                             size="small"
                             className="flex-1"
                             value={data.category_id}
@@ -156,10 +212,12 @@ function Edit({ product, categories }) {
                                 )),
                                 <Divider />,
                             ])}
-                        </FormSelect>
+                        </Select>
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Unit"}>
                         <TextField
+                            error={!!errors.unit}
+                            helperText={errors.unit}
                             size="small"
                             className="flex-1"
                             placeholder="Unit (eg. kg, L, package, bag)"
@@ -172,6 +230,8 @@ function Edit({ product, categories }) {
                 <FormFieldGroup title={"Product Price + Stock"}>
                     <FormFieldWithLabel label={"Price"}>
                         <TextField
+                            error={!!errors.price}
+                            helperText={errors.name}
                             size="small"
                             className="flex-1"
                             placeholder="0"
@@ -183,6 +243,8 @@ function Edit({ product, categories }) {
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Quantity"}>
                         <TextField
+                            error={!!errors.stock_quantity}
+                            helperText={errors.stock_quantity}
                             size="small"
                             className="flex-1"
                             placeholder="0"

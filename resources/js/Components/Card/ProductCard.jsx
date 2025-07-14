@@ -1,47 +1,59 @@
 import { formatNumber } from "@/utils/formatHelper";
-import { Link } from "@inertiajs/react";
 import {
+    Favorite,
     FavoriteBorderOutlined,
     ShoppingCartOutlined,
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import clsx from "clsx";
 import AddToCartButton from "../Button/AddToCartButton";
+import AddToWishlistButton from "../Button/AddToWishlistButton";
+import LinkText from "../Common/LinkText";
 
-function ProductCard({ product, bagde }) {
-    const image = product.images?.find((image) => image.is_default)?.path;
+function ProductCard({ product, wishlist }) {
     const hasStock = product.stock_quantity > 0;
 
+    const goToCategory = (slug) => `/collections/${slug}`;
+    const goToProduct = (slug) => `/products/${slug}`;
+
     return (
-        <div className="h-full flex flex-col items-start gap-2.5 p-5 bg-white border rounded-xl hover:shadow-lg group relative overflow-hidden transition-all duration-200 ease-in-out ">
-            <Link href={`/products/${product.slug}`}>
+        <div className="h-full flex flex-col items-start gap-2.5 p-5 bg-white border rounded-xl hover:shadow-lg group overflow-hidden transition-all duration-200 ease-in-out relative">
+            {product?.is_featured ? (
+                <div className="absolute top-5 left-5 z-30 bg-green-100 border border-green-600 px-2 py-0.5 rounded-full text-xs text-green-600">
+                    Featured
+                </div>
+            ) : null}
+            <LinkText preserveScroll={false} href={goToProduct(product.slug)}>
                 <div className="overflow-hidden w-full aspect-square relative">
                     <Avatar
-                        src={image}
+                        src={product.image.path}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         variant="square"
                     />
                     {!hasStock && (
                         <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
-                            <span className="bg-red-600 text-white px-2 py-1 rounded-md text-xs font-medium">
+                            <span className="text-red-600 border bg-white/50 border-red-600 px-4 py-1 rounded text-xs font-medium -rotate-12">
                                 Out of Stock
                             </span>
                         </div>
                     )}
                 </div>
-            </Link>
+            </LinkText>
 
-            <Link href={`/products/${product.slug}`}>
+            <LinkText preserveScroll={false} href={goToProduct(product.slug)}>
                 <p className="font-bold hover:text-green-600 hover:underline">
                     {product.name}
                 </p>
-            </Link>
+            </LinkText>
 
-            <Link href={`/categories/${product.category.slug}`}>
+            <LinkText
+                preserveScroll={false}
+                href={goToCategory(product.category.slug)}
+            >
                 <p className="text-sm hover:text-green-800 hover:underline">
                     {product.category.name}
                 </p>
-            </Link>
+            </LinkText>
 
             <div className="w-full flex items-center justify-between">
                 <div>
@@ -66,7 +78,13 @@ function ProductCard({ product, bagde }) {
 
             <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <button className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">
-                    <FavoriteBorderOutlined className="text-lg" />
+                    <AddToWishlistButton id={product.id}>
+                        {wishlist?.some((id) => id === product.id) ? (
+                            <Favorite className="text-lg text-red-600 opacity-100" />
+                        ) : (
+                            <FavoriteBorderOutlined className="text-lg" />
+                        )}
+                    </AddToWishlistButton>
                 </button>
                 {hasStock && (
                     <button className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">

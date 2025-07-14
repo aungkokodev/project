@@ -1,12 +1,14 @@
-import FormFieldGroup from "@/Components/FormFieldGroup";
-import FormFieldWithLabel from "@/Components/FormFieldWithLabel";
-import FormImageInput from "@/Components/FormImageInput";
+import FormFieldGroup from "@/Components/Input/FormFieldGroup";
+import FormFieldWithLabel from "@/Components/Input/FormFieldWithLabel";
+import FormImageInput from "@/Components/Input/FormImageInput";
+import Select from "@/Components/Input/Select";
+import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Admin/Layout";
-import { router, useForm } from "@inertiajs/react";
-import { Button, MenuItem, Select, TextField } from "@mui/material";
+import { useForm } from "@inertiajs/react";
+import { Button, MenuItem } from "@mui/material";
 
 function Edit({ category, categories }) {
-    const { data, setData } = useForm({
+    const { data, setData, errors, setError, post } = useForm({
         name: category.name,
         description: category.description,
         parent_id: category.parent_id || "",
@@ -14,14 +16,14 @@ function Edit({ category, categories }) {
     });
 
     const handleSubmit = () => {
-        const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("description", data.description);
-        formData.append("parent_id", data.parent_id);
-        formData.append("image", data.image);
-        formData.append("_method", "PUT");
-
-        router.post(`/admin/categories/${category.id}`, formData);
+        post(`/admin/categories/${category.id}`);
+        // const formData = new FormData();
+        // formData.append("name", data.name);
+        // formData.append("description", data.description);
+        // formData.append("parent_id", data.parent_id);
+        // formData.append("image", data.image);
+        // formData.append("_method", "PUT");
+        // router.post(`/admin/categories/${category.id}`, formData);
     };
 
     return (
@@ -39,7 +41,12 @@ function Edit({ category, categories }) {
                                 : URL.createObjectURL(data.image)
                         }
                         onClose={() => setData("image", "")}
-                        onChange={(e) => setData("image", e.target.files[0])}
+                        onChange={(e) => {
+                            setData("image", e.target.files[0]);
+                            setError("image", "");
+                        }}
+                        error={!!errors.image}
+                        helperText={errors.image}
                     />
                 </FormFieldGroup>
             </div>
@@ -53,6 +60,8 @@ function Edit({ category, categories }) {
                             required
                             value={data.name}
                             onChange={(e) => setData("name", e.target.value)}
+                            error={!!errors.name}
+                            helperText={errors.name}
                         />
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Description"}>
@@ -65,6 +74,8 @@ function Edit({ category, categories }) {
                             onChange={(e) =>
                                 setData("description", e.target.value)
                             }
+                            error={!!errors.description}
+                            helperText={errors.description}
                         />
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Parent Category"}>
@@ -75,6 +86,8 @@ function Edit({ category, categories }) {
                             onChange={(e) =>
                                 setData("parent_id", e.target.value)
                             }
+                            error={!!errors.parent_id}
+                            helperText={errors.parent_id}
                         >
                             <MenuItem value={""}>No Parent</MenuItem>
                             {categories.map((category) => (
