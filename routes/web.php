@@ -7,6 +7,9 @@ use App\Http\Controllers\Web\{
   CategoryController,
   ProductController,
   CartController,
+  CheckoutController,
+  MergeController,
+  OrderController,
   WishlistController,
   ProfileContorller,
   ReviewController,
@@ -44,14 +47,24 @@ Route::post('/wishlist/add', [WishlistController::class, 'add']);
 Route::post('/wishlist/toggle', [WishlistController::class, 'toggle']);
 Route::post('/wishlist/remove', [WishlistController::class, 'remove']);
 
-Route::post('/reviews', [ReviewController::class, 'store']);
-
 Route::get('/about', [PageController::class, 'about']);
 Route::get('/contact', [PageController::class, 'contact']);
 
+Route::get('/checkout', [CheckoutController::class, 'index'])->middleware('auth');
+Route::get('/merge-choice', [MergeController::class, 'index'])->middleware('auth');
+Route::post('/merge-choice/resolve', [MergeController::class, 'resolve'])->middleware('auth');
 
-Route::middleware(['auth', 'role:customer'])->name('user.')->group(function () {
+
+Route::middleware(['auth', 'role:customer'])->group(function () {
   Route::get('/profile', [ProfileContorller::class, 'index'])->name('profile');
+
+  Route::post('/reviews', [ReviewController::class, 'store']);
+
+  Route::post('/checkout/process', [CheckoutController::class, 'process']);
+
+  Route::get('/orders', [OrderController::class, 'index']);
+  Route::get('/orders/{order}', [OrderController::class, 'show']);
+  Route::get('/order/{order}/confirmation', [OrderController::class, 'confirmation'])->name('order.confirmation');
 });
 
 
@@ -70,12 +83,6 @@ Route::prefix('/admin')->middleware(['auth', 'role:admin'])->name('admin.')->gro
   Route::put('reviews/{review}/approved', [AdminReviewController::class, 'approved'])->name('reviews.approved');
   Route::put('reviews/{review}/flagged', [AdminReviewController::class, 'flagged'])->name('reviews.flagged');
 
-
-
-  Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
-  Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
-  Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
-
   Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
   Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
   Route::put('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])
@@ -85,6 +92,11 @@ Route::prefix('/admin')->middleware(['auth', 'role:admin'])->name('admin.')->gro
   Route::post('orders/{order}/items', [AdminOrderItemController::class, 'store'])
     ->name('orders.items.store');
 
+  Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile.index');
+  Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
+  Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
+
+
   Route::get('customers', [AdminCustomerController::class, 'index'])->name('customers.index');
   Route::get('customers/{user}', [AdminCustomerController::class, 'show'])->name('customers.show');
   Route::delete('customers/{user}', [AdminCustomerController::class, 'destroy'])
@@ -92,13 +104,9 @@ Route::prefix('/admin')->middleware(['auth', 'role:admin'])->name('admin.')->gro
 
   Route::resource('discounts', AdminDiscountController::class)->except('show');
 
-  Route::get('reports/sales', [AdminReportController::class, 'sales'])->name('reports.sales');
-  Route::get('reports/products', [AdminReportController::class, 'products'])
+  Route::get('insights/sales', [AdminReportController::class, 'sales'])->name('reports.sales');
+  Route::get('insights/products', [AdminReportController::class, 'products'])
     ->name('reports.products');
-  Route::get('reports/customers', [AdminReportController::class, 'customers'])
-    ->name('reports.customers');
-  Route::get('reports/export/sales', [AdminReportController::class, 'exportSales'])
-    ->name('reports.export.sales');
 });
 
 require __DIR__ . '/auth.php';

@@ -9,4 +9,9 @@ use Illuminate\Notifications\Notifiable;
 class Wishlist extends Model
 {
     use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'user_id',
+        'product_id'
+    ];
 }

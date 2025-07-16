@@ -11,7 +11,7 @@ class AdminOrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with(['user.addresses', 'items'])->get();
+        $orders = Order::with(['user.addresses', 'items.product.image'])->get();
 
         return Inertia::render('Admin/Order/Index', [
             'orders' => $orders
@@ -20,7 +20,7 @@ class AdminOrderController extends Controller
 
     public function show(string $id)
     {
-        //
+        return Inertia::render('Admin/Order/Show');
     }
 
     public function update(Request $request, string $id)

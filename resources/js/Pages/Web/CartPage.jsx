@@ -193,7 +193,10 @@ function CartPage({ cart }) {
                                     </span>
                                 </div>
                             </div>
-                            <PrimaryButton className="w-full mt-6 flex justify-center">
+                            <PrimaryButton
+                                className="w-full mt-6 flex justify-center"
+                                onClick={() => router.visit("/checkout")}
+                            >
                                 Proceed to Checkout
                                 <ArrowRight className="ml-2 w-5 h-5" />
                             </PrimaryButton>

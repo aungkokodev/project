@@ -13,7 +13,7 @@ function TopBarAccount() {
 
     const path =
         role === "customer"
-            ? route("user.profile")
+            ? route("profile")
             : role === "admin"
             ? route("admin.dashboard")
             : route("login");

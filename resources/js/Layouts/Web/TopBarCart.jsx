@@ -43,7 +43,10 @@ function TopBarCart() {
         });
     };
 
-    const goToCheckout = () => "/checkout";
+    const goToCheckout = () => {
+        setOpen(false);
+        router.visit("/checkout");
+    };
 
     const goToCart = () => {
         setOpen(false);

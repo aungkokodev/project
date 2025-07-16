@@ -28,7 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Throwable $e, Illuminate\Http\Request $request) {
             $status = 500;
             if ($e instanceof AuthenticationException) {
-                $status = 401;
+                return redirect()->guest(route('login'));
             } elseif ($e instanceof AuthorizationException) {
                 $status = 403;
             } elseif ($e instanceof HttpExceptionInterface) {

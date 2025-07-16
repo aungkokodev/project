@@ -4,6 +4,7 @@ import {
     CategoryOutlined,
     DashboardOutlined,
     GrassOutlined,
+    Inventory2Outlined,
     KeyboardArrowDownOutlined,
     KeyboardArrowRightOutlined,
     LeaderboardOutlined,
@@ -203,6 +204,16 @@ function Sidebar() {
 
 export default Sidebar;
 
+// Add to your existing imports
+import {
+    AssignmentReturnOutlined,
+    CalendarTodayOutlined,
+    LocalFloristOutlined,
+    LocalShippingOutlined,
+    PsychologyOutlined,
+    YardOutlined,
+} from "@mui/icons-material";
+
 function getNavItems() {
     return [
         {
@@ -211,29 +222,31 @@ function getNavItems() {
             url: "/admin/dashboard",
         },
         {
-            text: "Products",
-            icon: <ListAltOutlined fontSize="small" />,
+            text: "Agri-Products",
+            icon: <LocalFloristOutlined fontSize="small" />,
             children: [
                 {
                     text: "Categories",
                     icon: <CategoryOutlined fontSize="small" />,
                     url: "/admin/categories",
+                    description: "Seeds | Fertilizers | Tools",
                 },
                 {
                     text: "Products",
                     icon: <WidgetsOutlined fontSize="small" />,
                     url: "/admin/products",
+                    badge: "Updated",
+                },
+                {
+                    text: "Inventory",
+                    icon: <Inventory2Outlined fontSize="small" />,
+                    url: "/admin/inventory",
                 },
                 {
                     text: "Reviews",
                     icon: <StarBorderOutlined fontSize="small" />,
                     url: "/admin/reviews",
                 },
-                // {
-                //     text: "Inventory",
-                //     icon: <Inventory2Outlined fontSize="small" />,
-                //     url: "/admin/inventory",
-                // },
             ],
         },
         {
@@ -247,24 +260,24 @@ function getNavItems() {
             url: "/admin/orders",
         },
         {
-            text: "Reports",
+            text: "Insights",
             icon: <LeaderboardOutlined fontSize="small" />,
             children: [
                 {
-                    text: "Sale",
+                    text: "Sales Trends",
                     icon: <TrendingUpOutlined fontSize="small" />,
-                    url: "/admin/reports/sales",
+                    url: "/admin/insights/sales",
                 },
                 {
-                    text: "Product",
-                    icon: <WidgetsOutlined fontSize="small" />,
-                    url: "/admin/reports/products",
+                    text: "Product Analysis",
+                    icon: <YardOutlined fontSize="small" />,
+                    url: "/admin/insights/products",
                 },
-                {
-                    text: "Customer",
-                    icon: <PersonOutline fontSize="small" />,
-                    url: "/admin/reports/customers",
-                },
+                // {
+                //     text: "Customers",
+                //     icon: <PsychologyOutlined fontSize="small" />,
+                //     url: "/admin/insights/customers",
+                // },
             ],
         },
     ];

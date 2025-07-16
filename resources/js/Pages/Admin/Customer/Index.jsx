@@ -14,7 +14,12 @@ function EmptyData() {
 }
 
 const columns = [
-    { field: "id", headerName: "#", width: 64 },
+    {
+        field: "id",
+        headerName: "#",
+        width: 64,
+        headerClassName: "bg-gray-100 border-e-0",
+    },
     {
         field: "name",
         headerName: "Customer",
@@ -25,14 +30,26 @@ const columns = [
             </div>
         ),
         flex: 1,
+        headerClassName: "bg-gray-100 border-e-0",
     },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "phone", headerName: "Phone", flex: 1 },
+    {
+        field: "email",
+        headerName: "Email",
+        flex: 1,
+        headerClassName: "bg-gray-100 border-e-0",
+    },
+    {
+        field: "phone",
+        headerName: "Phone",
+        flex: 1,
+        headerClassName: "bg-gray-100 border-e-0",
+    },
     {
         field: "created_at",
         headerName: "Created At",
         valueGetter: (v) => new Date(v),
         valueFormatter: (v) => v.toLocaleDateString("en-UK"),
+        headerClassName: "bg-gray-100 border-e-0",
     },
     // {
     //     field: "product",
@@ -94,7 +111,8 @@ function Index({ customers }) {
                     pagination: { paginationModel: { page: 0, pageSize: 10 } },
                 }}
                 slots={{ noRowsOverlay: EmptyData }}
-                className="text-inherit px-4 rounded-lg"
+                getRowClassName={(params) => "bg-red-100"}
+                // className="text-inherit px-4 rounded-lg"
             />
         </div>
     );

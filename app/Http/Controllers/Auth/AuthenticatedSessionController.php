@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Web\MergeController;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,9 +14,6 @@ use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): Response
     {
         return Inertia::render('Auth/Login', [
@@ -24,16 +22,14 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        $role = Auth::user()->role;
+        $user = Auth::user();
+        $role = $user->role;
 
         if ($role === 'admin') {
             $route = '/admin/dashboard';
@@ -41,17 +37,21 @@ class AuthenticatedSessionController extends Controller
             $route = '/profile';
         }
 
-        return redirect($route);
+        $response =  MergeController::handleConflict($user);
+
+        if ($response) {
+            return $response;
+        }
+
+        return redirect()->intended($route);
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
 
         session()->forget('cart');
+        session()->forget('wishlist');
 
         $request->session()->invalidate();
 

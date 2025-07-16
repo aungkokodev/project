@@ -13,11 +13,10 @@ class ProfileContorller extends Controller
     public function index()
     {
         $user = Auth::user();
-        $reviews = Review::with(['product.image'])->where('user_id', $user->id)->get();
+        $user->load(['addresses', 'reviews.product.image', 'orders.items.product.image']);
 
         return Inertia::render("Web/Profile", [
             'user' => $user,
-            'reviews' => $reviews
         ]);
     }
 

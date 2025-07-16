@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Web\MergeController;
 use App\Models\User;
+use App\Services\WishlistService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +17,9 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+
+    public function __construct(protected WishlistService $wishlistService) {}
+
     public function create(): Response
     {
         return Inertia::render('Auth/Register');
@@ -43,6 +48,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect('/profile');
+        MergeController::handleConflict($user);
+
+        return redirect()->intended('/profile');
     }
 }

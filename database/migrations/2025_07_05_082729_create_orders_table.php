@@ -16,12 +16,15 @@ return new class extends Migration
             $table->string('order_number')->unique();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('total_amount', 10, 0);
-            $table->enum('status', ['pending', 'shipped', 'delivered', 'cancelled', 'refunded'])->default('pending');
-            $table->enum('payment_method', ['cod', 'credit_card', 'bank_transfer', 'digital_wallet']);
-            $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
+            $table->enum('status', ['pending', 'shipped', 'delivered', 'cancelled'])->default('pending');
+            $table->enum('payment_method', ['cod', 'bank_transfer']);
+            $table->enum('payment_status', ['pending', 'paid'])->default('pending');
             $table->foreignId('shipping_address_id')->constrained('addresses')->restrictOnDelete();
             $table->foreignId('billing_address_id')->constrained('addresses')->restrictOnDelete();
             $table->text('notes')->nullable();
+            $table->text('admin_notes')->nullable();
+            $table->timestamp('shipped_at')->nullable();
+            $table->timestamp('delivered_at')->nullable();
             $table->timestamps();
         });
     }
