@@ -1,31 +1,62 @@
-import FormFieldGroup from "@/Components/Input/FormFieldGroup";
-import FormFieldWithLabel from "@/Components/Input/FormFieldWithLabel";
+import PrimaryButton from "@/Components/Button/PrimaryButton";
 import FormImageInput from "@/Components/Input/FormImageInput";
 import Select from "@/Components/Input/Select";
 import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Admin/Layout";
 import { useForm } from "@inertiajs/react";
-import { Button, MenuItem } from "@mui/material";
+import { SaveOutlined } from "@mui/icons-material";
+import {
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    MenuItem,
+} from "@mui/material";
 
-function Create({ categories }) {
-    const { data, setData, errors, setError, post } = useForm({
+function Create({ categories, open, setOpen, isMain }) {
+    const {
+        data,
+        setData,
+        errors,
+        setError,
+        clearErrors,
+        post,
+        reset,
+        setDefaults,
+    } = useForm({
         name: "",
-        description: "",
         parent_id: "",
         image: "",
     });
 
+    const handleClose = () => {
+        reset();
+        setDefaults({ image: "", name: "", parent_id: "" });
+        clearErrors();
+        setOpen(false);
+    };
+
     const handleSubmit = () => {
-        post("/admin/categories");
+        const url = isMain ? "/admin/maincategories" : "/admin/subcategories";
+        post(url, {
+            onSuccess: handleClose,
+        });
     };
 
     return (
-        <div className="grid gap-5 grid-cols-[1fr_2fr]">
-            <div>
-                <FormFieldGroup
-                    title={"Category Image"}
-                    className={"pr-5 pb-5"}
-                >
+        <Dialog
+            fullWidth
+            maxWidth="md"
+            open={open}
+            onClose={() => setOpen(false)}
+        >
+            <DialogTitle className="p-5 flex gap-5 items-center text-lg">
+                {isMain ? "Create Main Category" : "Create Sub Category"}
+            </DialogTitle>
+
+            <DialogContent dividers className="p-5 grid gap-5 grid-cols-3">
+                <div className="col-span-1">
+                    <label className="block mb-2.5">Image</label>
                     <FormImageInput
                         showImage={Boolean(data.image)}
                         src={data.image && URL.createObjectURL(data.image)}
@@ -37,65 +68,66 @@ function Create({ categories }) {
                         error={!!errors.image}
                         helperText={errors.image}
                     />
-                </FormFieldGroup>
-            </div>
-            <div className="flex flex-col gap-5">
-                <FormFieldGroup title={"Category Information"}>
-                    <FormFieldWithLabel label={"Category Name"}>
+                </div>
+                <div className="col-span-2 space-y-2.5">
+                    <div>
+                        <label className="block mb-2.5">Category Name</label>
                         <TextField
                             required
-                            size="small"
-                            className="flex-1"
+                            className="w-full"
                             placeholder="Category Name"
                             value={data.name}
                             onChange={(e) => setData("name", e.target.value)}
                             error={!!errors.name}
                             helperText={errors.name}
                         />
-                    </FormFieldWithLabel>
-                    <FormFieldWithLabel label={"Description"}>
-                        <TextField
-                            required
-                            size="small"
-                            className="flex-1"
-                            placeholder="Description"
-                            value={data.description}
-                            onChange={(e) =>
-                                setData("description", e.target.value)
-                            }
-                            error={!!errors.description}
-                            helperText={errors.description}
-                        />
-                    </FormFieldWithLabel>
-                    <FormFieldWithLabel label={"Parent Category"}>
-                        <Select
-                            size="small"
-                            className="flex-1"
-                            value={data.parent_id}
-                            onChange={(e) =>
-                                setData("parent_id", e.target.value)
-                            }
-                        >
-                            <MenuItem value={""}>No Parent</MenuItem>
-                            {categories.map((category) => (
-                                <MenuItem value={category.id} key={category.id}>
-                                    {category.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormFieldWithLabel>
-                </FormFieldGroup>
-                <Button
-                    className="px-5 py-2.5 ms-auto rounded-lg bg-green-600 text-white hover:bg-green-700"
+                    </div>
+                    {!isMain && (
+                        <div>
+                            <label className="block mb-2.5">
+                                Parent Category
+                            </label>
+                            <Select
+                                required
+                                className="w-full"
+                                value={data.parent_id}
+                                onChange={(e) =>
+                                    setData("parent_id", e.target.value)
+                                }
+                                error={!!errors.parent_id}
+                                helperText={errors.parent_id}
+                            >
+                                {categories.map((category) => (
+                                    <MenuItem
+                                        value={category.id}
+                                        key={category.id}
+                                    >
+                                        {category.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </div>
+                    )}
+                </div>
+            </DialogContent>
+
+            <DialogActions className="p-5">
+                <PrimaryButton
+                    onClick={handleClose}
+                    variant="text"
+                    className="min-w-auto"
+                >
+                    Close
+                </PrimaryButton>
+                <PrimaryButton
+                    startIcon={<SaveOutlined />}
                     onClick={handleSubmit}
                 >
                     Create Category
-                </Button>
-            </div>
-        </div>
+                </PrimaryButton>
+            </DialogActions>
+        </Dialog>
     );
 }
-
-Create.layout = (page) => <Layout children={page} title={"Create Category"} />;
 
 export default Create;

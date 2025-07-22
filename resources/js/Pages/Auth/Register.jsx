@@ -83,7 +83,11 @@ export default function Register() {
                     error={errors.password_confirmation}
                 />
 
-                <PrimaryButton className="w-full py-3.5" disabled={processing}>
+                <PrimaryButton
+                    type="submit"
+                    className="w-full py-3.5"
+                    disabled={processing}
+                >
                     Register
                 </PrimaryButton>
 

@@ -1,11 +1,17 @@
+import PrimaryButton from "@/Components/Button/PrimaryButton";
 import FormFieldGroup from "@/Components/Input/FormFieldGroup";
 import FormFieldWithLabel from "@/Components/Input/FormFieldWithLabel";
 import FormImageInput from "@/Components/Input/FormImageInput";
 import Select from "@/Components/Input/Select";
 import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Admin/Layout";
-import { useForm } from "@inertiajs/react";
-import { Button, Divider, MenuItem } from "@mui/material";
+import { router, useForm } from "@inertiajs/react";
+import {
+    EditOutlined,
+    HomeOutlined,
+    WidgetsOutlined,
+} from "@mui/icons-material";
+import { Divider, MenuItem } from "@mui/material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -15,7 +21,7 @@ function Edit({ product, categories }) {
         category_id: product.category_id || "",
         unit: product.unit || "",
         price: product.price || 0,
-        stock_quantity: product.stock_quantity || 0,
+        stock: product.stock || 0,
         defaultImage: product.images?.[0]?.path || "",
         additionalImages: product.images?.slice(1).map((v) => v?.path) || [],
         description: product.description || "",
@@ -43,29 +49,11 @@ function Edit({ product, categories }) {
         setData("new_additionalImages", newData);
     };
 
+    const handleCancel = () => {
+        router.visit("/admin/products");
+    };
+
     const handleSubmit = () => {
-        // const formData = new FormData();
-        // formData.append("name", data.name);
-        // formData.append("category_id", data.category_id);
-        // formData.append("unit", data.unit);
-        // formData.append("price", data.price);
-        // formData.append("stock_quantity", data.stock_quantity);
-        // formData.append("description", data.description);
-        // formData.append("defaultImage", data.defaultImage);
-        // formData.append("_method", "PUT");
-
-        // data.additionalImages.forEach((img, i) => {
-        //     if (img instanceof File) {
-        //         formData.append(`new_additionalImages[]`, img);
-        //     } else {
-        //         formData.append(`existing_additionalImages[]`, img);
-        //     }
-        // });
-
-        // router.post(`/admin/products/${product.id}`, formData);
-
-        // handleImageChange(data.additionalImages);
-
         post(`/admin/products/${product.id}`);
     };
 
@@ -87,9 +75,10 @@ function Edit({ product, categories }) {
                                 : URL.createObjectURL(data.defaultImage))
                         }
                         onClose={() => setData("defaultImage", null)}
-                        onChange={(e) =>
-                            setData("defaultImage", e.target.files[0])
-                        }
+                        onChange={(e) => {
+                            setError("defaultImage", "");
+                            setData("defaultImage", e.target.files[0]);
+                        }}
                     />
                     <div className="grid grid-cols-3 gap-5">
                         <FormImageInput
@@ -243,17 +232,15 @@ function Edit({ product, categories }) {
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Quantity"}>
                         <TextField
-                            error={!!errors.stock_quantity}
-                            helperText={errors.stock_quantity}
+                            error={!!errors.stock}
+                            helperText={errors.stock}
                             size="small"
                             className="flex-1"
                             placeholder="0"
                             required
                             type="number"
-                            value={data.stock_quantity}
-                            onChange={(e) =>
-                                setData("stock_quantity", e.target.value)
-                            }
+                            value={data.stock}
+                            onChange={(e) => setData("stock", e.target.value)}
                         />
                     </FormFieldWithLabel>
                 </FormFieldGroup>
@@ -267,17 +254,40 @@ function Edit({ product, categories }) {
                         />
                     </FormFieldWithLabel>
                 </FormFieldGroup>
-                <Button
-                    className="px-5 py-2.5 rounded-lg bg-green-600 text-white ms-auto hover:bg-green-700"
-                    onClick={handleSubmit}
-                >
-                    Update Product
-                </Button>
+                <div className="flex gap-5 justify-end">
+                    <PrimaryButton onClick={handleCancel} variant="outlined">
+                        Cancel
+                    </PrimaryButton>
+                    <PrimaryButton onClick={handleSubmit}>
+                        Update Product
+                    </PrimaryButton>
+                </div>
             </div>
         </div>
     );
 }
 
-Edit.layout = (page) => <Layout children={page} title={"Edit Product"} />;
+Edit.layout = (page) => (
+    <Layout
+        children={page}
+        title="Edit Product"
+        breadcrumbs={[
+            {
+                label: "Dashboard",
+                url: "/admin/dashboard",
+                icon: <HomeOutlined />,
+            },
+            {
+                label: "Products",
+                url: "/admin/products",
+                icon: <WidgetsOutlined />,
+            },
+            {
+                label: "Edit",
+                icon: <EditOutlined />,
+            },
+        ]}
+    />
+);
 
 export default Edit;

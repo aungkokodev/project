@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class Category extends Model
 {
@@ -14,7 +15,6 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description',
         'image',
         'parent_id',
     ];
@@ -34,11 +34,30 @@ class Category extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function orderItems()
+    {
+        return $this->hasManyThrough(
+            OrderItem::class,
+            Product::class,
+            'category_id',
+            'product_id',
+            'id',
+            'id'
+        );
+    }
+
     protected static function booted()
     {
         static::creating(function ($category) {
-            $combined = uuid_create() . '-' . $category->name;
-            $category->slug = substr(sha1($combined), 0, 16);
+            $baseSlug = Str::slug($category->name);
+            $slug = $baseSlug;
+            $i = 1;
+
+            while (static::where('slug', $slug)->exists()) {
+                $slug = "{$baseSlug}-" . $i++;
+            }
+
+            $category->slug = $slug;
         });
 
         static::saved(function () {

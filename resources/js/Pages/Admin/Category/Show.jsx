@@ -1,47 +1,96 @@
-import Layout from "@/Layouts/Admin/Layout";
-import { TabContext, TabPanel } from "@mui/lab";
-import { Avatar, Divider, Tab, Tabs } from "@mui/material";
-import { useState } from "react";
+import PrimaryButton from "@/Components/Button/PrimaryButton";
+import { getDate } from "@/utils/formatHelper";
+import { EditOutlined } from "@mui/icons-material";
+import {
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+} from "@mui/material";
 
-function Show({ category }) {
-    const [tab, setTab] = useState("details");
-
+function Show({ category, open, setOpen, setOpenEdit }) {
     return (
-        <div className="grid gap-5 grid-cols-[1fr_2fr]">
-            <Avatar
-                src={category.image}
-                className="w-full h-auto border rounded-lg"
-            />
-            <div className="w-full py-5 px-10 border rounded-lg">
-                <TabContext value={tab}>
-                    <Tabs value={tab}>
-                        <Tab value={"details"} label={"Details"} />
-                    </Tabs>
-                    <Divider />
-                    <TabPanel value={"details"} className="px-5 py-0">
-                        <div className="flex py-5">
-                            <p className="font-bold w-40">Category Name</p>
-                            <p className="flex-1">{category.name}</p>
-                        </div>
-                        <Divider />
-                        <div className="flex py-5">
-                            <p className="font-bold w-40">Parent Category</p>
-                            <p className="flex-1">
-                                {category.parent?.name || "NULL"}
+        <Dialog
+            open={open}
+            onClose={() => setOpen(false)}
+            maxWidth="md"
+            fullWidth
+        >
+            <DialogTitle className="p-5 flex gap-5 items-center text-lg">
+                {category.name}
+                <Chip
+                    color="primary"
+                    label={category.parent ? "Sub Category" : "Main Category"}
+                />
+            </DialogTitle>
+            <DialogContent dividers className="p-5 grid gap-5 grid-cols-3">
+                <div className="col-span-1 aspect-square border rounded-xl overflow-hidden">
+                    <img src={category.image} />
+                </div>
+                <div className="col-span-2 grid grid-cols-2 gap-5 self-start">
+                    <div className="col-span-2">
+                        <p className="font-bold opacity-70 mb-1">Name</p>
+                        <p>{category.name}</p>
+                    </div>
+                    <div>
+                        <p className="font-bold opacity-70 mb-1">Slug</p>
+                        <p>{category.slug}</p>
+                    </div>
+                    <div>
+                        <p className="font-bold opacity-70 mb-1">
+                            Products Count
+                        </p>
+                        <p>{category.products_count}</p>
+                    </div>
+                    <div>
+                        <p className="font-bold opacity-70 mb-1">Created At</p>
+                        <p>{getDate(category.created_at)}</p>
+                    </div>
+                    <div>
+                        <p className="font-bold opacity-70 mb-1">
+                            Last Updated At
+                        </p>
+                        <p>{getDate(category.updated_at)}</p>
+                    </div>
+                    {category.parent && (
+                        <div>
+                            <p className="font-bold opacity-70 mb-1">
+                                Parent Category
                             </p>
+                            <p>{category.parent.name}</p>
                         </div>
-                        <Divider />
-                        <div className="flex py-5">
-                            <p className="font-bold w-40">Description</p>
-                            <p className="flex-1">{category.description}</p>
+                    )}
+                    {!category.parent && (
+                        <div>
+                            <p className="font-bold opacity-70 mb-1">
+                                Sub Categories Count
+                            </p>
+                            <p>{category.children.length}</p>
                         </div>
-                    </TabPanel>
-                </TabContext>
-            </div>
-        </div>
+                    )}
+                </div>
+            </DialogContent>
+            <DialogActions className="p-5">
+                <PrimaryButton
+                    onClick={() => setOpen(false)}
+                    variant="text"
+                    className="min-w-auto"
+                >
+                    Close
+                </PrimaryButton>
+                <PrimaryButton
+                    startIcon={<EditOutlined />}
+                    onClick={() => {
+                        setOpen(false);
+                        setOpenEdit(true);
+                    }}
+                >
+                    Edit Category
+                </PrimaryButton>
+            </DialogActions>
+        </Dialog>
     );
 }
-
-Show.layout = (page) => <Layout children={page} title={"Category Details"} />;
 
 export default Show;

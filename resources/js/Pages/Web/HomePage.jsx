@@ -4,16 +4,14 @@ import Container from "@/Components/Common/Container";
 import Layout from "@/Layouts/Web/Layout";
 import { Head, Link, router } from "@inertiajs/react";
 import { Avatar, Rating } from "@mui/material";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Award, Clock, Star, Zap } from "lucide-react";
 
 function HomePage({
     categories,
     featured,
-    bestSelling,
     topRated,
     newArrivals,
     happyCustomers,
-    wishlistProductIds,
 }) {
     const goToCategory = (slug) => `/collections/${slug}`;
 
@@ -21,43 +19,49 @@ function HomePage({
         <div>
             <Head title="Home" />
 
-            <section className="h-[calc(100vh-128px)] bg-green-700 bg-[url(/storage/assets/hero.jpg)] bg-center bg-cover">
-                <Container className="h-full flex flex-col gap-10 items-center justify-center">
-                    <h1 className="font-bold text-5xl text-white text-center drop-shadow-lg">
+            <section className="relative h-[90vh] min-h-[600px] overflow-hidden bg-green-700 bg-[url('/storage/assets/hero.jpg')] bg-cover bg-center">
+                <Container className="h-full flex flex-col gap-10 items-center justify-center text-center relative px-5">
+                    <h1 className="font-bold text-5xl md:text-6xl text-white leading-tight drop-shadow-lg">
                         Quality Supplies for Small Farms
                     </h1>
-                    <p className="text-white text-center text-xl drop-shadow-lg">
+                    <p className="text-white/90 text-xl md:text-2xl max-w-2xl drop-shadow-lg">
                         Everything your small farm needs, all in one place.
+                        Premium quality at affordable prices.
                     </p>
-                    <PrimaryButton onClick={() => router.visit("collections")}>
+                    <PrimaryButton onClick={() => router.visit("/collections")}>
                         Browse Products
-                        <ArrowRight />
+                        <ArrowRight className="ml-2" />
                     </PrimaryButton>
                 </Container>
             </section>
 
             <section>
-                <Container className="py-5">
-                    <h2 className="font-bold text-xl text-center mb-5">
-                        SHOP BY CATEGORY
-                    </h2>
-                    <div className="flex gap-5 lg:justify-center pb-4 overflow-x-auto hide-scrollbar">
-                        {categories.map((category) => (
+                <Container className="py-10 px-10">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                            Shop By Category
+                        </h2>
+                        <p className="text-gray-600 max-w-2xl mx-auto">
+                            Explore our wide range of farm supplies organized by
+                            category for easy browsing
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
+                        {categories.slice(0, 6).map((category) => (
                             <Link
                                 key={category.id}
                                 href={goToCategory(category.slug)}
                                 preserveScroll
                                 preserveState
-                                className="flex-shrink-0 w-1/2 md:w-1/4 lg:w-1/8 flex flex-col gap-3 items-center p-4 border shadow-sm border-gray-100 rounded-xl bg-white hover:shadow-md transition-all duration-200 group"
+                                className="group border flex flex-col items-center p-6 rounded-xl transition-all duration-300 hover:shadow-md"
                             >
-                                <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-green-50 transition-colors">
+                                <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                     <Avatar
                                         src={category.image}
-                                        className="w-12 h-12 object-contain transition-transform group-hover:scale-110"
+                                        className="w-14 h-14 object-contain"
                                     />
                                 </div>
-
-                                <p className="text-sm text-center text-gray-700 group-hover:text-green-600 transition-colors group-hover:underline">
+                                <p className="text-center font-medium text-gray-800 group-hover:text-green-600 transition-colors">
                                     {category.name}
                                 </p>
                             </Link>
@@ -66,121 +70,170 @@ function HomePage({
                 </Container>
             </section>
 
-            <section className="bg-green-50">
-                <Container className="py-5">
-                    <h2 className="font-bold text-xl mb-5">
-                        Featured Products
-                    </h2>
-                    <div className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar">
+            <section className="bg-gray-50">
+                <Container className="px-10 py-10">
+                    <div className="flex justify-between items-end mb-10">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <Zap className="text-green-600" />
+                                <span className="text-sm font-semibold text-green-600">
+                                    FEATURED
+                                </span>
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900">
+                                Featured Products
+                            </h2>
+                        </div>
+                        <Link
+                            href="/collections"
+                            className="text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
+                        >
+                            View all <ArrowRight />
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
                         {featured.map((p) => (
-                            <div
+                            <ProductCard
                                 key={p.id}
-                                className="flex-shrink-0 w-[calc(16.69%-17px)] min-w-[200px]"
-                            >
-                                <ProductCard
-                                    product={p}
-                                    wishlist={wishlistProductIds}
-                                />
-                            </div>
+                                product={p}
+                                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                            />
                         ))}
                     </div>
                 </Container>
             </section>
 
             <section>
-                <Container className="py-5">
-                    <h2 className="font-bold text-xl mb-5">
-                        Best Selling Products
-                    </h2>
-                    <div className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar">
-                        {bestSelling.map((p) => (
-                            <div
-                                key={p.id}
-                                className="flex-shrink-0 w-[calc(16.69%-17px)] min-w-[200px]"
-                            >
-                                <ProductCard
-                                    product={p}
-                                    wishlist={wishlistProductIds}
-                                />
+                <Container className="px-10 py-10">
+                    <div className="flex justify-between items-end mb-10">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <Award className="text-green-600" />
+                                <span className="text-sm font-semibold text-green-600">
+                                    TOP RATED
+                                </span>
                             </div>
-                        ))}
+                            <h2 className="text-3xl font-bold text-gray-900">
+                                Top Rated Products
+                            </h2>
+                        </div>
+                        <Link
+                            href="/collections"
+                            className="text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
+                        >
+                            View all <ArrowRight />
+                        </Link>
                     </div>
-                </Container>
-            </section>
-
-            <section className="bg-green-50">
-                <Container className="py-5">
-                    <h2 className="font-bold text-xl mb-5">
-                        Top Rated Products
-                    </h2>
-                    <div className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
                         {topRated.map((p) => (
-                            <div
+                            <ProductCard
                                 key={p.id}
-                                className="flex-shrink-0 w-[calc(16.69%-17px)] min-w-[200px]"
-                            >
-                                <ProductCard
-                                    product={p}
-                                    wishlist={wishlistProductIds}
-                                />
-                            </div>
+                                product={p}
+                                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                            />
                         ))}
                     </div>
                 </Container>
             </section>
 
-            <section>
-                <Container className="py-5">
-                    <h2 className="font-bold text-xl mb-5">
-                        New Arrival Products
-                    </h2>
-                    <div className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar">
+            <section className="bg-gray-50">
+                <Container className="px-10 py-10">
+                    <div className="flex justify-between items-end mb-10">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <Clock className="text-green-600" />
+                                <span className="text-sm font-semibold text-green-600">
+                                    NEW
+                                </span>
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900">
+                                New Arrivals
+                            </h2>
+                        </div>
+                        <Link
+                            href="/collections"
+                            className="text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
+                        >
+                            View all <ArrowRight />
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
                         {newArrivals.map((p) => (
-                            <div
+                            <ProductCard
                                 key={p.id}
-                                className="flex-shrink-0 w-[calc(16.69%-17px)] min-w-[200px]"
-                            >
-                                <ProductCard
-                                    product={p}
-                                    wishlist={wishlistProductIds}
-                                />
-                            </div>
+                                product={p}
+                                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                            />
                         ))}
                     </div>
                 </Container>
             </section>
 
-            <section>
-                <Container className="py-5">
-                    <h2 className="font-bold text-xl mb-5">
-                        Tursted by Customers
-                    </h2>
-                    <div className="flex gap-5 overflow-x-auto pb-5 hide-scrollbar">
+            <section className="bg-white">
+                <Container className="px-10 py-10">
+                    <div className="text-center mb-12">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                            <Star className="text-green-600" size={20} />
+                            <span className="text-sm font-semibold text-green-600">
+                                REVIEWS
+                            </span>
+                        </div>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                            Trusted by Customers
+                        </h2>
+                        <p className="text-gray-600 max-w-2xl mx-auto">
+                            Hear what our customers say about our products and
+                            service
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {happyCustomers.slice(0, 4).map((r) => (
                             <div
                                 key={r.id}
-                                className="flex-shrink-0 w-[calc(25%-15px)] min-w-[200px] border p-5 rounded-2xl bg-white"
+                                className="bg-white border border-gray-200 p-6 rounded-2xl hover:shadow-md transition-shadow"
                             >
                                 <Rating
                                     value={r.rating}
                                     size="small"
                                     readOnly
+                                    precision={0.5}
                                 />
-                                <div className="line-clamp-3 my-2.5 text-balance">
-                                    {r.comment}
+                                <div className="my-4 text-gray-700 italic">
+                                    "{r.comment}"
                                 </div>
-                                <div className="flex gap-2.5 items-center">
+                                <div className="flex gap-3 items-center">
                                     <Avatar
                                         src={r.user.avatar}
                                         className="w-10 h-10"
                                     />
-                                    <p className="font-bold text-sm">
-                                        {r.user.name}
-                                    </p>
+                                    <div>
+                                        <p className="font-bold text-sm">
+                                            {r.user.name}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            Verified Customer
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         ))}
                     </div>
+                </Container>
+            </section>
+
+            <section className="bg-gray-50">
+                <Container className="flex flex-col items-center gap-5 px-10 py-10 text-center">
+                    <h2 className="text-3xl font-bold">
+                        Ready to Upgrade Your Farm?
+                    </h2>
+                    <p className="text-lg max-w-2xl">
+                        Join thousands of satisfied customers who trust us for
+                        their farm supplies
+                    </p>
+                    <PrimaryButton onClick={() => router.visit("collections")}>
+                        Shop Now
+                        <ArrowRight />
+                    </PrimaryButton>
                 </Container>
             </section>
         </div>

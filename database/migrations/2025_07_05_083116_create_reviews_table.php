@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('rating')->numberBetween(1, 5);
             $table->text('comment')->nullable();
+            $table->boolean('is_reviewed')->default(false);
             $table->boolean('is_approved')->default(false);
             $table->timestamps();
             $table->unique(['user_id', 'product_id']);

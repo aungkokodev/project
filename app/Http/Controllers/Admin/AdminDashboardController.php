@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class AdminDashboardController extends Controller
@@ -18,7 +22,33 @@ class AdminDashboardController extends Controller
             'orders' => $this->getMetricData('orders'),
             'customers' => $this->getMetricData('customers'),
             'products' => $this->getMetricData('products'),
+            'categorySales' => $this->getCategorySalesData(),
+            'inventory' => $this->getInventoryData(),
+            'recentOrders' => $this->getRecentOrders(),
+            'topProducts' => $this->getTopProducts()
         ]);
+    }
+
+    protected function getRecentOrders()
+    {
+        return Order::with(['user'])->latest()->take(5)->get();
+    }
+
+    protected function getTopProducts()
+    {
+        return Product::query()
+            ->select([
+                'products.*',
+                DB::raw('SUM(order_items.quantity) as sales_count'),
+                DB::raw('SUM(order_items.quantity * order_items.price) as sales_total')
+            ])
+            ->join('order_items', 'order_items.product_id', '=', 'products.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', 'delivered')
+            ->groupBy('products.id')
+            ->orderByDesc('sales_total')
+            ->take(5)
+            ->get();
     }
 
     protected function getMetricData(string $metricType)
@@ -28,9 +58,7 @@ class AdminDashboardController extends Controller
             'last_7_days' => $this->calculateMetric($metricType, 'day', 7),
             'last_30_days' => $this->calculateMetric($metricType, 'day', 30),
             'this_month' => $this->calculateMetric($metricType, 'month', 1),
-            // 'last_month' => $this->calculateMetric($metricType, 'month', 2),
             'this_year' => $this->calculateMetric($metricType, 'year', 1),
-            // 'last_year' => $this->calculateMetric($metricType, 'year', 2),
         ];
     }
 
@@ -41,7 +69,7 @@ class AdminDashboardController extends Controller
 
         $currentValue = $this->getMetricValue($metricType, $currentPeriod['start'], $currentPeriod['end']);
         $previousValue = $this->getMetricValue($metricType, $previousPeriod['start'], $previousPeriod['end']);
-        // dd($currentPeriod, $previousPeriod);
+
         return [
             'total' => $currentValue,
             'previous_total' => $previousValue,
@@ -66,12 +94,10 @@ class AdminDashboardController extends Controller
                     ->startOfDay()
                     ->subMonths($timeRange - 1)
                     ->startOfMonth(),
-                // ->subMonth($timeRange - 1),
                 'end' => Carbon::today()
                     ->endOfDay()
                     ->subMonths($timeRange - $subtractFrom)
                     ->endOfMonth()
-                // ->subMonth($timeRange - 1)
             ],
             'year' => [
                 'start' => Carbon::today()
@@ -213,6 +239,70 @@ class AdminDashboardController extends Controller
         return $result;
     }
 
+    protected function getCategorySalesData()
+    {
+        $startDate = Carbon::now()->subMonths(11)->startOfMonth();
+        $endDate = Carbon::now()->endOfMonth();
+
+        $mainCategories = Category::whereNull('parent_id')
+            ->with(['children'])
+            ->get();
+
+        $monthlyData = [];
+        $period = CarbonPeriod::create($startDate, '1 month', $endDate);
+
+        foreach ($period as $date) {
+            $monthKey = $date->format('Y-m');
+            $monthLabel = $date->format('M Y');
+            $monthStart = $date->copy()->startOfMonth();
+            $monthEnd = $date->copy()->endOfMonth();
+
+            foreach ($mainCategories as $category) {
+                $monthlyData[$monthKey]['date'] = $monthLabel;
+
+                $categorySales = OrderItem::whereHas('product', function ($query) use ($category) {
+                    $query->where('category_id', $category->id);
+                })
+                    ->whereHas('order', function ($query) use ($monthStart, $monthEnd) {
+                        $query->where('status', 'delivered')
+                            ->whereBetween('created_at', [$monthStart, $monthEnd]);
+                    })
+                    ->sum(DB::raw('quantity * price'));
+
+                $monthlyData[$monthKey]['categories'][$category->id]['name'] = $category->name;
+                $monthlyData[$monthKey]['categories'][$category->id]['total'] = (int)$categorySales ?? 0;
+
+                foreach ($category->children as $subcategory) {
+                    $subcategorySales = OrderItem::whereHas('product', function ($query) use ($subcategory) {
+                        $query->where('category_id', $subcategory->id);
+                    })
+                        ->whereHas('order', function ($query) use ($monthStart, $monthEnd) {
+                            $query->where('status', 'delivered')
+                                ->whereBetween('created_at', [$monthStart, $monthEnd]);
+                        })
+                        ->sum(DB::raw('quantity * price'));
+
+                    $monthlyData[$monthKey]['categories'][$category->id]['total'] += $subcategorySales;
+                }
+            }
+        }
+
+        return array_values($monthlyData);
+    }
+
+    protected function getInventoryData()
+    {
+        $in_stock = Product::where('stock', '>', '5')->count();
+        $low_stock = Product::where('stock', '<=', '5')->where('stock', '>', '0')->count();
+        $out_of_stock = Product::where('stock', '<', '1')->count();
+
+        return [
+            ['value' => $in_stock, 'label' => 'In Stock'],
+            ['value' => $low_stock, 'label' => 'Low Stock'],
+            ['value' => $out_of_stock, 'label' => 'Out of Stock'],
+        ];
+    }
+
     protected function calculatePercentageChange($current, $previous)
     {
         if ($previous == 0) {
@@ -221,265 +311,3 @@ class AdminDashboardController extends Controller
         return round((($current - $previous) / $previous) * 100);
     }
 }
-
-// {
-//     public function index()
-//     {
-
-//         return Inertia::render('Admin/Dashboard/Index', [
-//             'sales' => [
-//                 'today' => $this->getSalesData('day', 1),
-//                 'last_7_days' => $this->getSalesData('day', 7),
-//                 'last_30_days' => $this->getSalesData('day', 30),
-//                 'this_month' => $this->getSalesData('month', 0),
-//                 'last_month' => $this->getSalesData('month', 1),
-//             ],
-//             'orders' => [
-//                 'today' => $this->getOrdersData('day', 1),
-//                 'last_7_days' => $this->getOrdersData('day', 7),
-//                 'last_30_days' => $this->getOrdersData('day', 30),
-//                 'this_month' => $this->getOrdersData('month', 0),
-//                 'last_month' => $this->getOrdersData('month', 1),
-//             ],
-//             'customers' => [
-//                 'today' => $this->getCustomersData('day', 1),
-//                 'last_7_days' => $this->getCustomersData('day', 7),
-//                 'last_30_days' => $this->getCustomersData('day', 30),
-//                 'this_month' => $this->getCustomersData('month', 0),
-//                 'last_month' => $this->getCustomersData('month', 1),
-//             ],
-//             'products' => [
-//                 'today' => $this->getProductData('day', 1),
-//                 'last_7_days' => $this->getProductData('day', 7),
-//                 'last_30_days' => $this->getProductData('day', 30),
-//                 'this_month' => $this->getProductData('month', 0),
-//                 'last_month' => $this->getProductData('month', 1),
-//             ],
-//         ]);
-//     }
-
-//     protected function getCustomersData(string $timeUnit, int $timeRange)
-//     {
-//         $currentStart = $timeUnit === 'day'
-//             ? Carbon::now()->subDays($timeRange)
-//             : Carbon::now()->subMonths($timeRange)->startOfMonth();
-
-//         $currentEnd = $timeUnit === 'day'
-//             ? Carbon::now()
-//             : Carbon::now()->subMonths($timeRange)->endOfMonth();
-
-//         $previousStart = $timeUnit === 'day'
-//             ? Carbon::now()->subDays($timeRange * 2)
-//             : $currentStart->copy()->subMonth();
-
-//         $current = User::whereBetween('created_at', [$currentStart, $currentEnd])
-//             ->where('role', 'customer')
-//             ->count();
-
-//         $previous = User::whereBetween('created_at', [$previousStart, $currentStart])
-//             ->where('role', 'customer')
-//             ->count();
-
-//         $daily = $this->getDailyCustomersData($currentStart, $currentEnd);
-
-//         return [
-//             'total' => $current,
-//             'previous_total' => $previous,
-//             'change' => $this->calculatePercentageChange($current, $previous),
-//             'daily' => $daily,
-//         ];
-//     }
-
-//     protected function getDailyCustomersData(Carbon $start, Carbon $end)
-//     {
-//         $sales = User::selectRaw('DATE(created_at) as date, COUNT(id) as total')
-//             ->whereBetween('created_at', [$start, $end])
-//             ->where('role', 'customer')
-//             ->groupBy('date')
-//             ->pluck('total', 'date');
-
-//         $period = CarbonPeriod::create($start, $end);
-//         $salesByDay = [];
-
-//         foreach ($period as $date) {
-//             $day = $date->toDateString();
-//             $salesByDay[] = [
-//                 'date' => $date->format('M d'),
-//                 'total' => $sales[$day] ?? 0,
-//             ];
-//         }
-
-//         return $salesByDay;
-//     }
-
-//     protected function getOrdersData(string $timeUnit, int $timeRange)
-//     {
-//         $currentStart = $timeUnit === 'day'
-//             ? Carbon::now()->subDays($timeRange)
-//             : Carbon::now()->subMonths($timeRange)->startOfMonth();
-
-//         $currentEnd = $timeUnit === 'day'
-//             ? Carbon::now()
-//             : Carbon::now()->subMonths($timeRange)->endOfMonth();
-
-//         $previousStart = $timeUnit === 'day'
-//             ? Carbon::now()->subDays($timeRange * 2)
-//             : $currentStart->copy()->subMonth();
-
-//         $current = Order::whereBetween('created_at', [$currentStart, $currentEnd])
-//             ->where('status', 'delivered')
-//             ->count();
-
-//         $previous = Order::whereBetween('created_at', [$previousStart, $currentStart])
-//             ->where('status', 'delivered')
-//             ->count();
-
-//         $daily = $this->getDailyOrdersData($currentStart, $currentEnd);
-
-//         return [
-//             'total' => $current,
-//             'previous_total' => $previous,
-//             'change' => $this->calculatePercentageChange($current, $previous),
-//             'daily' => $daily,
-//         ];
-//     }
-
-//     protected function getDailyOrdersData(Carbon $start, Carbon $end)
-//     {
-//         $sales = Order::selectRaw('DATE(created_at) as date, COUNT(id) as total')
-//             ->whereBetween('created_at', [$start, $end])
-//             ->where('status', 'delivered')
-//             ->groupBy('date')
-//             ->pluck('total', 'date');
-
-//         $period = CarbonPeriod::create($start, $end);
-//         $salesByDay = [];
-
-//         foreach ($period as $date) {
-//             $day = $date->toDateString();
-//             $salesByDay[] = [
-//                 'date' => $date->format('M d'),
-//                 'total' => $sales[$day] ?? 0,
-//             ];
-//         }
-
-//         return $salesByDay;
-//     }
-
-//     protected function getProductData(string $timeUnit, int $timeRange)
-//     {
-//         $currentStart = $timeUnit === 'day'
-//             ? Carbon::now()->subDays($timeRange)
-//             : Carbon::now()->subMonths($timeRange)->startOfMonth();
-
-//         $currentEnd = $timeUnit === 'day'
-//             ? Carbon::now()
-//             : Carbon::now()->subMonths($timeRange)->endOfMonth();
-
-//         $previousStart = $timeUnit === 'day'
-//             ? Carbon::now()->subDays($timeRange * 2)
-//             : $currentStart->copy()->subMonth();
-
-//         $current = Order::join('order_items', 'orders.id', '=', 'order_items.order_id')
-//             ->whereBetween('orders.created_at', [$currentStart, $currentEnd])
-//             ->where('status', 'delivered')
-//             ->sum('order_items.quantity');
-
-//         $previous = Order::join('order_items', 'orders.id', '=', 'order_items.order_id')
-//             ->whereBetween('orders.created_at', [$previousStart, $currentStart])
-//             ->where('status', 'delivered')
-//             ->sum('order_items.quantity');
-
-//         $daily = $this->getDailyProductsData($currentStart, $currentEnd);
-
-//         return [
-//             'total' => $current,
-//             'previous_total' => $previous,
-//             'change' => $this->calculatePercentageChange($current, $previous),
-//             'daily' => $daily,
-//         ];
-//     }
-
-//     protected function getDailyProductsData(Carbon $start, Carbon $end)
-//     {
-//         $sales = Order::join('order_items', 'orders.id', '=', 'order_items.order_id')
-//             ->selectRaw('DATE(orders.created_at) as date, SUM(order_items.quantity) as total')
-//             ->whereBetween('orders.created_at', [$start, $end])
-//             ->where('status', 'delivered')
-//             ->groupBy('date')
-//             ->pluck('total', 'date');
-
-//         $period = CarbonPeriod::create($start, $end);
-//         $salesByDay = [];
-
-//         foreach ($period as $date) {
-//             $day = $date->toDateString();
-//             $salesByDay[] = [
-//                 'date' => $date->format('M d'),
-//                 'total' => $sales[$day] ?? 0,
-//             ];
-//         }
-
-//         return $salesByDay;
-//     }
-
-//     protected function getSalesData(string $timeUnit, int $timeRange)
-//     {
-//         $currentStart = $timeUnit === 'day'
-//             ? Carbon::now()->subDays($timeRange)
-//             : Carbon::now()->subMonths($timeRange)->startOfMonth();
-
-//         $currentEnd = $timeUnit === 'day'
-//             ? Carbon::now()
-//             : Carbon::now()->subMonths($timeRange)->endOfMonth();
-
-//         $previousStart = $timeUnit === 'day'
-//             ? Carbon::now()->subDays($timeRange * 2)
-//             : $currentStart->copy()->subMonth();
-
-//         $currentSales = Order::whereBetween('created_at', [$currentStart, $currentEnd])
-//             ->where('status', 'delivered')
-//             ->sum('total_amount');
-
-//         $previousSales = Order::whereBetween('created_at', [$previousStart, $currentStart])
-//             ->where('status', 'delivered')
-//             ->sum('total_amount');
-
-//         $dailySales = $this->getDailySalesData($currentStart, $currentEnd);
-
-//         return [
-//             'total' => $currentSales,
-//             'previous_total' => $previousSales,
-//             'change' => $this->calculatePercentageChange($currentSales, $previousSales),
-//             'daily' => $dailySales,
-//         ];
-//     }
-
-//     protected function getDailySalesData(Carbon $start, Carbon $end)
-//     {
-//         $sales = Order::selectRaw('DATE(created_at) as date, SUM(total_amount) as total')
-//             ->whereBetween('created_at', [$start, $end])
-//             ->where('status', 'delivered')
-//             ->groupBy('date')
-//             ->pluck('total', 'date');
-
-//         $period = CarbonPeriod::create($start, $end);
-//         $salesByDay = [];
-
-//         foreach ($period as $date) {
-//             $day = $date->toDateString();
-//             $salesByDay[] = [
-//                 'date' => $date->format('M d'),
-//                 'total' => $sales[$day] ?? 0,
-//             ];
-//         }
-
-//         return $salesByDay;
-//     }
-
-//     protected function calculatePercentageChange($current, $previous)
-//     {
-//         if ($previous == 0) return 0;
-//         return round((($current - $previous) / $previous) * 100);
-//     }
-// }

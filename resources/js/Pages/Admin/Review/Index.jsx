@@ -1,97 +1,20 @@
-import EmptyDataGrid from "@/Components/EmptyDataGrid";
-import LinkDataCell from "@/Components/LinkDataCell";
+import CustomDataGrid from "@/Components/Common/CustomDataGrid";
+import DataCell from "@/Components/Common/DataCell";
 import StatusCard from "@/Components/StatusCard";
 import Layout from "@/Layouts/Admin/Layout";
-import { router, usePage } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import {
+    CancelOutlined,
     CheckCircleOutline,
     FiberNewOutlined,
+    HomeOutlined,
     RateReviewOutlined,
+    StarOutline,
     TimelapseOutlined,
 } from "@mui/icons-material";
-import { Rating, Switch } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { useEffect } from "react";
-import { toast, ToastContainer } from "react-toastify";
-
-const columns = [
-    {
-        field: "id",
-        headerName: "#",
-        width: 64,
-    },
-    {
-        field: "user",
-        headerName: "Customer",
-        valueGetter: (v) => v.name,
-        renderCell: ({ row }) => (
-            <LinkDataCell
-                text={row.user.name}
-                // url={`/admin/users/${row.user.id}`}
-                avatar={row.user?.avatar || "no avatar"}
-                avatarVariant="circle"
-            />
-        ),
-        flex: 1,
-    },
-    {
-        field: "product",
-        headerName: "Product",
-        valueGetter: (v) => v.name,
-        renderCell: ({ row }) => (
-            <LinkDataCell
-                text={row.product.name}
-                url={`/admin/products/${row.product.slug}`}
-                avatar={row.product.images.find((i) => i.is_default).path}
-            />
-        ),
-        flex: 1,
-    },
-    {
-        field: "rating",
-        headerName: "Rating",
-        renderCell: ({ value }) => (
-            <div className="h-full flex items-center">
-                <Rating value={value} readOnly />
-            </div>
-        ),
-        flex: 1,
-    },
-    {
-        field: "comment",
-        headerName: "Comment",
-        renderCell: ({ value }) => <LinkDataCell text={value} />,
-        flex: 1,
-    },
-    {
-        field: "created_at",
-        headerName: "Review At",
-        valueFormatter: (v) => new Date(v).toLocaleDateString("en-UK"),
-    },
-    {
-        field: "is_approved",
-        headerName: "Approved",
-        renderCell: ({ row, value }) => (
-            <Switch
-                color="success"
-                checked={Boolean(value)}
-                onClick={() =>
-                    router.put(`/admin/reviews/${row.id}/approved`, {
-                        is_approved: !row.is_approved,
-                    })
-                }
-            />
-        ),
-    },
-];
+import { Chip, Rating, Switch } from "@mui/material";
 
 function Index({ reviews, count }) {
-    const { flash } = usePage().props;
-
-    useEffect(() => {
-        if (toast.success) toast.success(flash.success);
-    });
-
     return (
         <>
             <div className="grid grid-cols-4 gap-5 mb-5">
@@ -99,11 +22,6 @@ function Index({ reviews, count }) {
                     title={"Total Reviews"}
                     value={count["total"]}
                     icon={<RateReviewOutlined />}
-                />
-                <StatusCard
-                    title={"Recet Reviews"}
-                    value={count["recent"]}
-                    icon={<FiberNewOutlined />}
                 />
                 <StatusCard
                     title={"Pending"}
@@ -115,25 +33,125 @@ function Index({ reviews, count }) {
                     value={count["approved"]}
                     icon={<CheckCircleOutline />}
                 />
+                <StatusCard
+                    title={"New This Week"}
+                    value={count["recent"]}
+                    icon={<FiberNewOutlined />}
+                />
             </div>
-            <DataGrid
-                rows={reviews}
-                columns={columns}
-                showToolbar
-                disableColumnMenu
-                sortingOrder={["asc", "desc"]}
-                pageSizeOptions={[7, 10, 25, 50, 100]}
-                initialState={{
-                    pagination: { paginationModel: { page: 0, pageSize: 7 } },
-                }}
-                slots={{ noRowsOverlay: EmptyDataGrid }}
-                className="text-inherit px-5 rounded-lg"
-            />
-            <ToastContainer />
+            <CustomDataGrid rows={reviews} columns={getColumns(reviews)} />
         </>
     );
 }
 
-Index.layout = (page) => <Layout children={page} title={"Customer Reviews"} />;
+Index.layout = (page) => (
+    <Layout
+        children={page}
+        title={"Customer Reviews"}
+        breadcrumbs={[
+            {
+                label: "Dashboard",
+                url: "/admin/dashboard",
+                icon: <HomeOutlined />,
+            },
+            {
+                label: "Reviews",
+                url: "/admin/reviews",
+                icon: <StarOutline />,
+            },
+        ]}
+    />
+);
 
 export default Index;
+
+function getColumns(data) {
+    return [
+        {
+            field: "id",
+            headerName: "#",
+            valueGetter: (id) =>
+                data.findIndex((review) => review.id == id) + 1,
+            width: 64,
+        },
+        {
+            field: "product",
+            headerName: "Product",
+            valueGetter: (product) => product.name,
+            renderCell: ({ row }) => (
+                <DataCell
+                    text={row.product.name}
+                    avatar={row.product.images.find((i) => i.is_default).path}
+                />
+            ),
+            flex: 1,
+        },
+        {
+            field: "user",
+            headerName: "Customer",
+            valueGetter: (user) => user.name,
+            renderCell: ({ row }) => (
+                <DataCell
+                    text={row.user.name}
+                    avatar={row.user?.avatar || ""}
+                    avatarVariant="circle"
+                />
+            ),
+            flex: 1,
+        },
+        {
+            field: "comment",
+            headerName: "Comment",
+            flex: 1,
+        },
+        {
+            field: "rating",
+            headerName: "Rating",
+            renderCell: ({ value }) => (
+                <div className="h-full flex items-center">
+                    <Rating value={value} readOnly />
+                </div>
+            ),
+            flex: 0.5,
+        },
+        {
+            field: "is_reviewed",
+            headerName: "Viewed by Admin",
+            renderCell: ({ row, value }) => (
+                <Chip
+                    variant="outlined"
+                    label={value ? "Checked" : "Not Checked"}
+                    color={value ? "success" : "warning"}
+                    icon={
+                        value ? (
+                            <CheckCircleOutline fontSize="small" />
+                        ) : (
+                            <CancelOutlined fontSize="small" />
+                        )
+                    }
+                />
+            ),
+            flex: 0.5,
+        },
+        {
+            field: "is_approved",
+            headerName: "Approved",
+            renderCell: ({ row, value }) => (
+                <Switch
+                    color="success"
+                    checked={Boolean(value)}
+                    onClick={() =>
+                        router.put(`/admin/reviews/${row.id}/approved`, {
+                            is_approved: !row.is_approved,
+                        })
+                    }
+                />
+            ),
+        },
+        {
+            field: "created_at",
+            headerName: "Created At",
+            valueFormatter: (v) => new Date(v).toLocaleDateString("en-UK"),
+        },
+    ];
+}

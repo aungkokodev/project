@@ -1,15 +1,10 @@
+import { router, usePage } from "@inertiajs/react";
 import { User } from "lucide-react";
 import IconButton from "../../Components/Button/IconButton";
-import { router, usePage } from "@inertiajs/react";
 
 function TopBarAccount() {
     const { auth } = usePage().props;
-
-    let role = null;
-
-    if (auth?.user) {
-        role = auth.user.role;
-    }
+    const role = auth?.user?.role ?? null;
 
     const path =
         role === "customer"
@@ -18,9 +13,7 @@ function TopBarAccount() {
             ? route("admin.dashboard")
             : route("login");
 
-    const goTo = () => {
-        router.visit(path);
-    };
+    const goTo = () => router.visit(path);
 
     return (
         <IconButton onClick={goTo}>

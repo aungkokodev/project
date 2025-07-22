@@ -12,14 +12,7 @@ class WishlistController extends Controller
 {
     public function index(Request $request)
     {
-        $wishlist = Auth::check()
-            ? Auth::user()->wishlist()->with(['image', 'category'])->get()
-            : collect(session('wishlist', []))->map(function ($id) {
-                return Product::with(['image', 'category'])->find($id);
-            })->filter()->values()->toArray();
-        return Inertia::render('Web/WishlistPage', [
-            'wishlist' => $wishlist
-        ]);
+        return Inertia::render('Web/WishlistPage');
     }
 
     public function add(Request $request)
@@ -67,10 +60,10 @@ class WishlistController extends Controller
 
             if ($user->wishlist()->where('product_id', $productId)->exists()) {
                 $user->wishlist()->detach($productId);
-                return back()->with('success', 'Removed from wishlist.');
+                return back()->with('success', 'Item removed from wishlist.');
             } else {
                 $user->wishlist()->attach($productId);
-                return back()->with('success', 'Added to wishlist.');
+                return back()->with('success', 'Item added to wishlist.');
             }
         } else {
             $wishlist = session()->get('wishlist', []);
@@ -78,11 +71,11 @@ class WishlistController extends Controller
             if (isset($wishlist[$productId])) {
                 unset($wishlist[$productId]);
                 session()->put('wishlist', $wishlist);
-                return back()->with('success', 'Removed from wishlist.');
+                return back()->with('success', 'Item removed from wishlist.');
             } else {
                 $wishlist[$productId] = $productId;
                 session()->put('wishlist', $wishlist);
-                return back()->with('success', 'Added to wishlist.');
+                return back()->with('success', 'Item added to wishlist.');
             }
         }
     }

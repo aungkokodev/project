@@ -1,38 +1,81 @@
-import FormFieldGroup from "@/Components/Input/FormFieldGroup";
-import FormFieldWithLabel from "@/Components/Input/FormFieldWithLabel";
+import PrimaryButton from "@/Components/Button/PrimaryButton";
 import FormImageInput from "@/Components/Input/FormImageInput";
 import Select from "@/Components/Input/Select";
 import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Admin/Layout";
 import { useForm } from "@inertiajs/react";
-import { Button, MenuItem } from "@mui/material";
+import { SaveOutlined } from "@mui/icons-material";
+import {
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    MenuItem,
+} from "@mui/material";
+import { useEffect } from "react";
 
-function Edit({ category, categories }) {
-    const { data, setData, errors, setError, post } = useForm({
-        name: category.name,
-        description: category.description,
-        parent_id: category.parent_id || "",
-        image: category.image,
+function Edit({ category, categories, open, setOpen, isMain }) {
+    const {
+        data,
+        setData,
+        errors,
+        setError,
+        clearErrors,
+        post,
+        reset,
+        setDefaults,
+    } = useForm({
+        name: "",
+        parent_id: "",
+        image: "",
     });
 
-    const handleSubmit = () => {
-        post(`/admin/categories/${category.id}`);
-        // const formData = new FormData();
-        // formData.append("name", data.name);
-        // formData.append("description", data.description);
-        // formData.append("parent_id", data.parent_id);
-        // formData.append("image", data.image);
-        // formData.append("_method", "PUT");
-        // router.post(`/admin/categories/${category.id}`, formData);
+    const handleClose = () => {
+        reset();
+        setDefaults({
+            name: category.name,
+            parent_id: category.parent_id || "",
+            image: category.image,
+        });
+        clearErrors();
+        setOpen(false);
     };
 
+    const handleSubmit = () => {
+        const url = isMain
+            ? `/admin/maincategories/${category.id}`
+            : `/admin/subcategories/${category.id}`;
+        post(url, {
+            onSuccess: handleClose,
+        });
+    };
+
+    useEffect(() => {
+        if (open) {
+            setData({
+                name: category.name,
+                parent_id: category.parent_id || "",
+                image: category.image,
+            });
+            clearErrors();
+        }
+    }, [category, open]);
+
     return (
-        <div className="grid grid-cols-[1fr_2fr] gap-5">
-            <div>
-                <FormFieldGroup
-                    title={"Category Image"}
-                    className={"pr-5 pb-5"}
-                >
+        <Dialog
+            fullWidth
+            maxWidth="md"
+            open={open}
+            onClose={() => setOpen(false)}
+            keepMounted={false}
+        >
+            <DialogTitle className="p-5 flex gap-5 items-center text-lg">
+                {isMain ? "Edit Main Category" : "Edit Sub Category"}
+            </DialogTitle>
+
+            <DialogContent dividers className="p-5 grid gap-5 grid-cols-3">
+                <div className="col-span-1">
+                    <label className="block mb-2.5">Image</label>
                     <FormImageInput
                         showImage={Boolean(data.image)}
                         src={
@@ -48,67 +91,66 @@ function Edit({ category, categories }) {
                         error={!!errors.image}
                         helperText={errors.image}
                     />
-                </FormFieldGroup>
-            </div>
-            <div className="flex gap-5 flex-col">
-                <FormFieldGroup title={"Category Information"}>
-                    <FormFieldWithLabel label={"Category Name"}>
+                </div>
+                <div className="col-span-2 space-y-2.5">
+                    <div>
+                        <label className="block mb-2.5">Category Name</label>
                         <TextField
-                            size="small"
-                            className="flex-1"
-                            placeholder="Category Name"
                             required
+                            className="w-full"
+                            placeholder="Category Name"
                             value={data.name}
                             onChange={(e) => setData("name", e.target.value)}
                             error={!!errors.name}
                             helperText={errors.name}
                         />
-                    </FormFieldWithLabel>
-                    <FormFieldWithLabel label={"Description"}>
-                        <TextField
-                            size="small"
-                            className="flex-1"
-                            placeholder="Description"
-                            required
-                            value={data.description}
-                            onChange={(e) =>
-                                setData("description", e.target.value)
-                            }
-                            error={!!errors.description}
-                            helperText={errors.description}
-                        />
-                    </FormFieldWithLabel>
-                    <FormFieldWithLabel label={"Parent Category"}>
-                        <Select
-                            size="small"
-                            className="flex-1"
-                            value={data.parent_id}
-                            onChange={(e) =>
-                                setData("parent_id", e.target.value)
-                            }
-                            error={!!errors.parent_id}
-                            helperText={errors.parent_id}
-                        >
-                            <MenuItem value={""}>No Parent</MenuItem>
-                            {categories.map((category) => (
-                                <MenuItem value={category.id} key={category.id}>
-                                    {category.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormFieldWithLabel>
-                </FormFieldGroup>
-                <Button
-                    className="px-5 py-2.5 ms-auto rounded-lg bg-green-600 text-white hover:bg-green-700"
+                    </div>
+                    {!isMain && (
+                        <div>
+                            <label className="block mb-2.5">
+                                Parent Category
+                            </label>
+                            <Select
+                                required
+                                className="w-full"
+                                value={data.parent_id}
+                                onChange={(e) =>
+                                    setData("parent_id", e.target.value)
+                                }
+                                error={!!errors.parent_id}
+                                helperText={errors.parent_id}
+                            >
+                                {categories.map((category) => (
+                                    <MenuItem
+                                        value={category.id}
+                                        key={category.id}
+                                    >
+                                        {category.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </div>
+                    )}
+                </div>
+            </DialogContent>
+
+            <DialogActions className="p-5">
+                <PrimaryButton
+                    onClick={handleClose}
+                    variant="text"
+                    className="min-w-auto"
+                >
+                    Close
+                </PrimaryButton>
+                <PrimaryButton
+                    startIcon={<SaveOutlined />}
                     onClick={handleSubmit}
                 >
                     Update Category
-                </Button>
-            </div>
-        </div>
+                </PrimaryButton>
+            </DialogActions>
+        </Dialog>
     );
 }
-
-Edit.layout = (page) => <Layout children={page} title={"Edit Category"} />;
 
 export default Edit;

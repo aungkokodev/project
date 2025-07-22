@@ -1,19 +1,15 @@
 import { Link, usePage } from "@inertiajs/react";
 import {
-    AccountCircleOutlined,
-    CategoryOutlined,
+    DashboardCustomizeOutlined,
     DashboardOutlined,
     GrassOutlined,
     Inventory2Outlined,
-    KeyboardArrowDownOutlined,
-    KeyboardArrowRightOutlined,
+    LayersOutlined,
     LeaderboardOutlined,
-    ListAltOutlined,
-    LogoutOutlined,
-    MoreVert,
-    PersonOutline,
+    PeopleOutline,
+    PieChartOutline,
     ShoppingCartOutlined,
-    StarBorderOutlined,
+    StarOutline,
     TrendingUpOutlined,
     WidgetsOutlined,
 } from "@mui/icons-material";
@@ -28,6 +24,13 @@ import {
     MenuItem,
 } from "@mui/material";
 import clsx from "clsx";
+import {
+    ChevronDown,
+    ChevronUp,
+    LogOut,
+    MoreVertical,
+    UserCircle,
+} from "lucide-react";
 import { useReducer, useState } from "react";
 
 function LinkOrDiv({ onClick, href, children }) {
@@ -71,12 +74,7 @@ function NavItem({ menu }) {
                     <ListItemText>
                         <span className="text-sm">{menu.text}</span>
                     </ListItemText>
-                    {menu.children &&
-                        (open ? (
-                            <KeyboardArrowDownOutlined />
-                        ) : (
-                            <KeyboardArrowRightOutlined />
-                        ))}
+                    {menu.children && (open ? <ChevronUp /> : <ChevronDown />)}
                 </ListItemButton>
             </LinkOrDiv>
 
@@ -122,21 +120,21 @@ function Profile() {
     };
 
     return (
-        <div className="w-full h-16 flex gap-2 items-center px-4 absolute left-0 bottom-0 border-t bg-slate-100">
+        <div className="w-full h-16 flex gap-2 items-center px-4 absolute left-0 bottom-0 border-t bg-gray-50">
             <Avatar src={user.avatar} />
             <div className="me-auto">
                 <p className="font-bold truncate">{user.name}</p>
                 <p className="text-xs truncate">{user.email}</p>
             </div>
             <div
-                className="py-1.5 border rounded hover:text-slate-800 hover:bg-slate-200 cursor-pointer"
+                className="py-1.5 border rounded hover:text-gray-800 hover:bg-gray-200 cursor-pointer"
                 onClick={handleMenuOpen}
                 id="account-options"
                 aria-controls={openMenu ? "account-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={openMenu ? "true" : undefined}
             >
-                <MoreVert />
+                <MoreVertical />
             </div>
 
             <Menu
@@ -162,7 +160,7 @@ function Profile() {
                 <Link href="/admin/profile">
                     <MenuItem onClick={handleMenuClose}>
                         <ListItemIcon>
-                            <AccountCircleOutlined />
+                            <UserCircle />
                         </ListItemIcon>
                         <ListItemText>Profile</ListItemText>
                     </MenuItem>
@@ -170,7 +168,7 @@ function Profile() {
                 <Link href="/logout" method="post">
                     <MenuItem onClick={handleMenuClose}>
                         <ListItemIcon>
-                            <LogoutOutlined />
+                            <LogOut />
                         </ListItemIcon>
                         <ListItemText>Logout</ListItemText>
                     </MenuItem>
@@ -180,10 +178,9 @@ function Profile() {
     );
 }
 
-// Done
-function Sidebar() {
+function SideBar() {
     return (
-        <div className="h-full bg-slate-100 border-r relative">
+        <div className="h-full bg-gray-50 border-r relative">
             <header className="h-16 px-10 flex gap-2 items-center border-b">
                 <GrassOutlined className="text-green-600" />
                 <span className="font-bold text-lg mt-1">Agri Supply</span>
@@ -202,17 +199,7 @@ function Sidebar() {
     );
 }
 
-export default Sidebar;
-
-// Add to your existing imports
-import {
-    AssignmentReturnOutlined,
-    CalendarTodayOutlined,
-    LocalFloristOutlined,
-    LocalShippingOutlined,
-    PsychologyOutlined,
-    YardOutlined,
-} from "@mui/icons-material";
+export default SideBar;
 
 function getNavItems() {
     return [
@@ -222,20 +209,18 @@ function getNavItems() {
             url: "/admin/dashboard",
         },
         {
-            text: "Agri-Products",
-            icon: <LocalFloristOutlined fontSize="small" />,
+            text: "Products",
+            icon: <DashboardCustomizeOutlined fontSize="small" />,
             children: [
                 {
                     text: "Categories",
-                    icon: <CategoryOutlined fontSize="small" />,
+                    icon: <LayersOutlined fontSize="small" />,
                     url: "/admin/categories",
-                    description: "Seeds | Fertilizers | Tools",
                 },
                 {
                     text: "Products",
                     icon: <WidgetsOutlined fontSize="small" />,
                     url: "/admin/products",
-                    badge: "Updated",
                 },
                 {
                     text: "Inventory",
@@ -244,16 +229,16 @@ function getNavItems() {
                 },
                 {
                     text: "Reviews",
-                    icon: <StarBorderOutlined fontSize="small" />,
+                    icon: <StarOutline fontSize="small" />,
                     url: "/admin/reviews",
                 },
             ],
         },
-        {
-            text: "Customers",
-            icon: <PersonOutline fontSize="small" />,
-            url: "/admin/customers",
-        },
+        // {
+        //     text: "Customers",
+        //     icon: <PeopleOutline fontSize="small" />,
+        //     url: "/admin/customers",
+        // },
         {
             text: "Orders",
             icon: <ShoppingCartOutlined fontSize="small" />,
@@ -264,18 +249,18 @@ function getNavItems() {
             icon: <LeaderboardOutlined fontSize="small" />,
             children: [
                 {
-                    text: "Sales Trends",
+                    text: "Sales",
                     icon: <TrendingUpOutlined fontSize="small" />,
                     url: "/admin/insights/sales",
                 },
-                {
-                    text: "Product Analysis",
-                    icon: <YardOutlined fontSize="small" />,
-                    url: "/admin/insights/products",
-                },
                 // {
-                //     text: "Customers",
-                //     icon: <PsychologyOutlined fontSize="small" />,
+                //     text: "Product",
+                //     icon: <PieChartOutline fontSize="small" />,
+                //     url: "/admin/insights/products",
+                // },
+                // {
+                //     text: "Customer",
+                //     icon: <PieChartOutline fontSize="small" />,
                 //     url: "/admin/insights/customers",
                 // },
             ],

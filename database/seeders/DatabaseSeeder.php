@@ -51,7 +51,6 @@ class DatabaseSeeder extends Seeder
         foreach ($categories as $categoryData) {
             $mainCategory = Category::factory()->create([
                 "name" => $categoryData["name"],
-                "description" => $categoryData["description"],
                 "image" => '/storage/categories/' . $categoryData['image']
             ]);
             foreach ($categoryData['products'] as $productData) {
@@ -74,7 +73,6 @@ class DatabaseSeeder extends Seeder
             foreach ($subcategories as $categoryData) {
                 $category = Category::factory()->create([
                     "name" => $categoryData["name"],
-                    "description" => $categoryData["description"],
                     'parent_id' => $mainCategory->id,
                     "image" => '/storage/categories/' . $categoryData['image']
                 ]);

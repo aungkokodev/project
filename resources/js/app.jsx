@@ -1,11 +1,11 @@
 import "../css/app.css";
 import "./bootstrap";
 
-import { createInertiaApp, usePage } from "@inertiajs/react";
+import { createInertiaApp } from "@inertiajs/react";
+import { ThemeProvider } from "@mui/material";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot, hydrateRoot } from "react-dom/client";
-import AdminLayout from "./Layouts/Admin/Layout";
-import WebLayout from "./Layouts/Web/Layout";
+import theme from "./theme";
 
 const appName = import.meta.env.VITE_APP_NAME || "Agri Supply";
 
@@ -17,12 +17,18 @@ createInertiaApp({
             import.meta.glob("./Pages/**/*.jsx")
         ),
     setup({ el, App, props }) {
+        const app = (
+            <ThemeProvider theme={theme}>
+                <App {...props} />
+            </ThemeProvider>
+        );
+
         if (import.meta.env.SSR) {
-            hydrateRoot(el, <App {...props} />);
+            hydrateRoot(el, app);
             return;
         }
 
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(app);
     },
     progress: {
         color: "#4B5563",

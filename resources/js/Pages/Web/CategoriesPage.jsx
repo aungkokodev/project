@@ -5,6 +5,7 @@ import Select from "@/Components/Input/Select";
 import Layout from "@/Layouts/Web/Layout";
 import { Head, router } from "@inertiajs/react";
 import { MenuItem, Pagination } from "@mui/material";
+import { Home } from "lucide-react";
 import CategoryMenu from "./CategoryMenu";
 
 function SortMenu({ value, onChange }) {
@@ -13,7 +14,7 @@ function SortMenu({ value, onChange }) {
             onChange={onChange}
             value={value}
             size="small"
-            className="rounded w-50"
+            className="rounded-lg w-50 text-inherit"
         >
             <MenuItem className="py-2" value="newest">
                 Newest
@@ -37,18 +38,12 @@ function SortMenu({ value, onChange }) {
     );
 }
 
-function CategoriesPage({
-    categories,
-    products,
-    sort,
-    currentCategory,
-    wishlistProductIds,
-}) {
+function CategoriesPage({ categories, products, sort, currentCategory }) {
     const slug = currentCategory?.slug;
 
     const handleSortChange = (e) => {
         router.get(
-            `/collections${slug ? "/" + slug : ""}`,
+            `/collections${slug ? `/${slug}` : ""}`,
             {
                 sort: e.target.value,
                 page: products.current_page,
@@ -62,7 +57,7 @@ function CategoriesPage({
 
     const handlePageChange = (_, page) => {
         router.get(
-            `/collections${slug ? "/" + slug : ""}`,
+            `/collections${slug ? `/${slug}` : ""}`,
             {
                 sort: sort,
                 page: page,
@@ -84,19 +79,17 @@ function CategoriesPage({
                 <SortMenu value={sort} onChange={handleSortChange} />
             </div>
 
-            <div className="p-5 hidden lg:block">
-                <CategoryMenu categories={categories} />
+            <div>
+                <div className="p-5 hidden lg:block sticky top-24">
+                    <CategoryMenu categories={categories} />
+                </div>
             </div>
 
             <div className="col-span-full lg:col-span-3 p-5">
                 {products.data?.length > 0 ? (
                     <div className="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                         {products.data.map((product) => (
-                            <ProductCard
-                                product={product}
-                                key={product.id}
-                                wishlist={wishlistProductIds}
-                            />
+                            <ProductCard product={product} key={product.id} />
                         ))}
                     </div>
                 ) : (
@@ -124,7 +117,10 @@ CategoriesPage.layout = (page) => <Layout children={page} />;
 export default CategoriesPage;
 
 function getBreadcrumbsData(category) {
-    const data = [{ label: "All", url: "/collections" }];
+    const data = [
+        { label: "Home", url: "/", icon: <Home size="20" /> },
+        { label: "All", url: "/collections" },
+    ];
 
     if (!category) return data;
 

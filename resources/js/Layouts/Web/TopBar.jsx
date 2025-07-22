@@ -7,13 +7,15 @@ import TopBarWishlist from "./TopBarWishlist";
 function TopBar() {
     return (
         <header className="sticky top-0 z-50 bg-white shadow">
-            <Container className="h-16 px-10 flex gap-5 items-center">
+            <Container className="h-16 px-5 md:px-10 flex items-center gap-5">
                 <div className="me-auto">
                     <Logo />
                 </div>
-                <TopBarAccount />
-                <TopBarWishlist />
-                <TopBarCart />
+                <div className="flex items-center gap-5">
+                    <TopBarAccount />
+                    <TopBarWishlist />
+                    <TopBarCart />
+                </div>
             </Container>
         </header>
     );

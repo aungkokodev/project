@@ -27,7 +27,10 @@ function CategoryMenu({ categories }) {
         <List className="p-0 overflow-hidden rounded-xl border">
             {categories?.map((category) => (
                 <Fragment key={category.id}>
-                    <ListItem className="border-b p-5" key={category.id}>
+                    <ListItem
+                        className="border-b p-5 last:border-b-0"
+                        key={category.id}
+                    >
                         <ListItemAvatar>
                             <Avatar src={category.image} variant="square" />
                         </ListItemAvatar>

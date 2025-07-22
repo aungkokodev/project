@@ -82,7 +82,11 @@ export default function Login({ status, canResetPassword }) {
                     )} */}
                 </div>
 
-                <PrimaryButton className="w-full py-3.5" disabled={processing}>
+                <PrimaryButton
+                    type="submit"
+                    className="w-full py-3.5"
+                    disabled={processing}
+                >
                     Log in
                 </PrimaryButton>
 

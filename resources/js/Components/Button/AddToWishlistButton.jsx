@@ -1,23 +1,21 @@
 import { router } from "@inertiajs/react";
 
-export default function AddToWishlistButton({ id, children }) {
-    const addToWishlist = () => {
+export default function AddToWishlistButton({ productId, children }) {
+    const toggleItem = () => {
         router.post(
             "/wishlist/toggle",
             {
-                product_id: id,
+                product_id: productId,
                 _method: "post",
             },
             {
                 preserveScroll: true,
-                onSuccess: () => {},
-                onError: () => {},
             }
         );
     };
 
     return (
-        <div onClick={addToWishlist} className="cursor-pointer">
+        <div onClick={toggleItem} className="cursor-pointer">
             {children}
         </div>
     );

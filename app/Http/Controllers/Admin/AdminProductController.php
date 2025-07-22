@@ -22,7 +22,7 @@ class AdminProductController extends Controller
         $total_count = Product::all()->count();
         $active_count = Product::where('is_active', '1')->count();
         $featured_count = Product::where('is_featured', '1')->count();
-        $empty_count = Product::where('stock_quantity', '<', 1)->count();
+        $empty_count = Product::where('stock', '<', 1)->count();
         $new_count =  Product::where('created_at', '>=', Carbon::now()->subDays(30))->count();
 
         return Inertia::render('Admin/Product/Index', [
@@ -37,7 +37,6 @@ class AdminProductController extends Controller
         ]);
     }
 
-    // 
     public function create()
     {
         $categories = Category::whereNull('parent_id')
@@ -59,13 +58,12 @@ class AdminProductController extends Controller
                 'description' => 'required|string',
                 'unit' => 'required|string',
                 'price' => 'required|numeric',
-                'stock_quantity' => 'required|numeric',
+                'stock' => 'required|numeric',
                 'images' => 'required|array|size:4',
                 'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
             ]);
 
         $product = Product::create($validated);
-
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $image) {
                 $path = $image->store('product_images', 'public');
@@ -76,9 +74,7 @@ class AdminProductController extends Controller
             }
         }
 
-        return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'Product created successfully');
+        return redirect('/admin/products')->with('success', 'Product created successfully');
     }
 
     public function show(string $id)
@@ -119,7 +115,7 @@ class AdminProductController extends Controller
             'description' => 'required|string',
             'unit' => 'required|string',
             'price' => 'required|numeric',
-            'stock_quantity' => 'required|numeric',
+            'stock' => 'required|numeric',
             'defaultImage' => 'required',
             'additionalImages' => 'required|array|size:3',
             'additionalImages.*' => 'required',

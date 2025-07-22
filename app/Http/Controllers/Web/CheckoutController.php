@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -19,8 +18,8 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        $address = Address::where('user_id', Auth::id())->where('is_default', true)->get();
-        $addresses = Address::where('user_id', Auth::id())->where('is_default', false)->get();
+        $address = Address::where('user_id', Auth::id())->where('is_default', true)->first();
+        $addresses = Address::where('user_id', Auth::id())->get();
 
         return Inertia::render('Web/CheckoutPage', [
             'defaultAddress' => $address,
@@ -38,11 +37,11 @@ class CheckoutController extends Controller
             'cart_items.*.quantity' => 'required|integer|min:1',
 
             'full_name' => 'required_if:address_id,null',
+            'phone' => 'required_if:address_id,null',
             'street' => 'required_if:address_id,null',
             'city' => 'required_if:address_id,null',
             'state' => 'required_if:address_id,null',
             'country' => 'required_if:address_id,null',
-            'phone' => 'required_if:address_id,null',
         ]);
 
         DB::beginTransaction();
@@ -64,7 +63,7 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            return redirect()->route('order.confirmation', ['order' => $order->id])
+            return redirect()->route('orders.confirmation', ['order' => $order->id])
                 ->with('success', 'Order placed successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -119,11 +118,11 @@ class CheckoutController extends Controller
                 'order_id' => $order->id,
                 'product_id' => $item['product']['id'],
                 'quantity' => $item['quantity'],
-                'unit_price' => $item['product']['price'],
+                'price' => $item['product']['price'],
             ]);
 
             Product::where('id', $item['product']['id'])
-                ->decrement('stock_quantity', $item['quantity']);
+                ->decrement('stock', $item['quantity']);
         }
 
         return $order;
@@ -138,9 +137,11 @@ class CheckoutController extends Controller
                     'message' => 'Bank transfer payment initiated'
                 ];
 
-                // case 'mobile_money':
-                //     // Integrate with mobile money API
-                //     return $this->processMobileMoneyPayment($order);
+            case 'mobile_money':
+                return [
+                    'success' => true,
+                    'message' => 'Mobile money payment initiated'
+                ];
 
             case 'cod':
                 return [
@@ -150,34 +151,6 @@ class CheckoutController extends Controller
 
             default:
                 throw new \Exception('Invalid payment method');
-        }
-    }
-
-    protected function processMobileMoneyPayment($order)
-    {
-        // Example: Integrate with MTN Mobile Money API
-        try {
-            $response = Http::post('https://mobile-money-api.com/payment', [
-                'amount' => $order->total,
-                'phone' => $order->user->phone,
-                'reference' => $order->order_number,
-            ]);
-
-            if ($response->successful()) {
-                $order->update([
-                    'payment_status' => 'pending',
-                    'transaction_reference' => $response->json('transaction_id')
-                ]);
-
-                return [
-                    'success' => true,
-                    'message' => 'Mobile money payment initiated'
-                ];
-            }
-
-            throw new \Exception($response->json('message', 'Mobile money payment failed'));
-        } catch (\Exception $e) {
-            throw new \Exception('Mobile money processing error: ' . $e->getMessage());
         }
     }
 

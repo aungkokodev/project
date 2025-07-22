@@ -15,17 +15,18 @@ class ReviewController extends Controller
             'product_id' => 'required|exists:products,id',
             'rating' => 'required|integer|between:1,5',
             'comment' => 'required|string',
+
         ]);
 
         $review = Review::updateOrCreate(
             [
                 'user_id' => Auth::id(),
                 'product_id' => $validated['product_id'],
-                // 'is_approved' => true
             ],
             [
                 'rating' => $validated['rating'],
                 'comment' => $validated['comment'],
+                'is_reviewed' => false
             ]
         );
 

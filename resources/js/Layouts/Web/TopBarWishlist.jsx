@@ -4,12 +4,12 @@ import { Badge } from "@mui/material";
 import { Heart } from "lucide-react";
 
 function TopBarWishlist() {
-    const { wishlistCount } = usePage().props || 0;
+    const { wishlist = [] } = usePage().props;
 
     const goToWishlist = () => router.visit("/wishlist");
 
     return (
-        <Badge badgeContent={wishlistCount} color="error" showZero>
+        <Badge badgeContent={wishlist.length} color="success" showZero>
             <IconButton onClick={goToWishlist}>
                 <Heart />
             </IconButton>

@@ -27,7 +27,7 @@ class ProductFactory extends Factory
             'slug' => fake()->slug(),
             'description' => fake()->paragraph(),
             'price' => fake()->numberBetween(30000, 50000),
-            'stock_quantity' => fake()->numberBetween(0, 100),
+            'stock' => fake()->numberBetween(0, 100),
             'unit' => fake()->randomElement(['kg', 'liter', 'bag', 'package']),
             'is_featured' => fake()->boolean(),
             'is_active' => fake()->boolean(100),

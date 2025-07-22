@@ -1,12 +1,12 @@
 import clsx from "clsx";
 
-function IconButton(props) {
+function IconButton({ className, ...props }) {
     return (
         <button
             {...props}
             className={clsx(
-                "w-6 h-6 hover:cursor-pointer hover:text-green-600 active:text-green-800 transition-colors disabled:hover:text-gray-600 disabled:cursor-not-allowed",
-                props.className
+                "className='w-6 h-6 cursor-pointer hover:brightness-50 active:brightness-90 transition disabled:cursor-not-allowed disabled:opacity-25",
+                className
             )}
         />
     );

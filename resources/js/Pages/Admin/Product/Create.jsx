@@ -1,11 +1,17 @@
+import PrimaryButton from "@/Components/Button/PrimaryButton";
 import FormFieldGroup from "@/Components/Input/FormFieldGroup";
 import FormFieldWithLabel from "@/Components/Input/FormFieldWithLabel";
 import FormImageInput from "@/Components/Input/FormImageInput";
 import Select from "@/Components/Input/Select";
 import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Admin/Layout";
-import { useForm } from "@inertiajs/react";
-import { Button, Divider, MenuItem } from "@mui/material";
+import { router, useForm } from "@inertiajs/react";
+import {
+    CreateOutlined,
+    HomeOutlined,
+    WidgetsOutlined,
+} from "@mui/icons-material";
+import { Divider, MenuItem } from "@mui/material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -15,12 +21,17 @@ function Create({ categories }) {
         category_id: "",
         unit: "",
         price: "",
-        stock_quantity: "",
+        stock: "",
         images: [],
         description: "",
     });
 
+    const handleCancel = () => {
+        router.visit("/admin/products");
+    };
+
     const handleSubmit = () => {
+        console.log(data);
         post("/admin/products");
     };
 
@@ -165,17 +176,15 @@ function Create({ categories }) {
                     </FormFieldWithLabel>
                     <FormFieldWithLabel label={"Quantity"}>
                         <TextField
-                            error={!!errors.stock_quantity}
-                            helperText={errors.stock_quantity}
+                            error={!!errors.stock}
+                            helperText={errors.stock}
                             size="small"
                             className="flex-1"
                             placeholder="0"
                             required
                             type="number"
-                            value={data.stock_quantity}
-                            onChange={(e) =>
-                                setData("stock_quantity", e.target.value)
-                            }
+                            value={data.stock}
+                            onChange={(e) => setData("stock", e.target.value)}
                         />
                     </FormFieldWithLabel>
                 </FormFieldGroup>
@@ -189,19 +198,46 @@ function Create({ categories }) {
                             className="h-64 flex-1"
                         />
                     </FormFieldWithLabel>
+                    <FormFieldWithLabel>
+                        <span className="text-sm text-red-700">
+                            {errors.description}
+                        </span>
+                    </FormFieldWithLabel>
                 </FormFieldGroup>
-
-                <Button
-                    className="px-5 py-2.5 rounded-lg bg-green-600 text-white ms-auto hover:bg-green-700"
-                    onClick={handleSubmit}
-                >
-                    Create Product
-                </Button>
+                <div className="flex gap-5 justify-end">
+                    <PrimaryButton onClick={handleCancel} variant="outlined">
+                        Cancel
+                    </PrimaryButton>
+                    <PrimaryButton onClick={handleSubmit}>
+                        Create Product
+                    </PrimaryButton>
+                </div>
             </div>
         </div>
     );
 }
 
-Create.layout = (page) => <Layout children={page} title={"Create Product"} />;
+Create.layout = (page) => (
+    <Layout
+        children={page}
+        title="Create Product"
+        breadcrumbs={[
+            {
+                label: "Dashboard",
+                url: "/admin/dashboard",
+                icon: <HomeOutlined />,
+            },
+            {
+                label: "Products",
+                url: "/admin/products",
+                icon: <WidgetsOutlined />,
+            },
+            {
+                label: "Create",
+                icon: <CreateOutlined />,
+            },
+        ]}
+    />
+);
 
 export default Create;

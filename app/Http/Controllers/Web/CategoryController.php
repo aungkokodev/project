@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -21,7 +20,9 @@ class CategoryController extends Controller
             ->get();
 
         $productsQuery = Product::with(['category', 'image'])
-            ->where('is_active', true);
+            ->where('is_active', true)
+            ->withAvg(['reviews' => fn($q) => $q->where('is_approved', true)], 'rating')
+            ->withCount(['reviews' => fn($q) => $q->where('is_approved', true)]);
 
         if ($slug) {
             $category = Category::where('slug', $slug)
@@ -47,18 +48,11 @@ class CategoryController extends Controller
             };
         })->paginate(20, ['*'], 'page', $page);
 
-        if (Auth::check()) {
-            $wishlistProductIds = Auth::user()->wishlist()->pluck('products.id')->toArray();
-        } else {
-            $wishlistProductIds = array_keys(session('wishlist', []));
-        }
-
         return Inertia::render('Web/CategoriesPage', [
             'categories' => $categories,
             'products' => $products,
             'sort' => $sort,
             'currentCategory' => $slug ? $category ?? null : null,
-            'wishlistProductIds' => $wishlistProductIds
         ]);
     }
 

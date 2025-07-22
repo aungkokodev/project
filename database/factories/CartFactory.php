@@ -20,7 +20,6 @@ class CartFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'session_id' => fake()->uuid(),
             'created_at' => Carbon::now()
                 ->subDays(rand(0, 90))
                 ->setHour(rand(0, 23))

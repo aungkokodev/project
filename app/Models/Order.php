@@ -20,6 +20,9 @@ class Order extends Model
         'shipping_address_id',
         'billing_address_id',
         'notes',
+        'admin_notes',
+        'shipped_at',
+        'delivered_at',
         'created_at'
     ];
 

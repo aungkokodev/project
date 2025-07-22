@@ -20,7 +20,6 @@ class CategoryFactory extends Factory
         return [
             'name' => fake()->unique()->words(2, true),
             'slug' => fake()->slug(),
-            'description' => fake()->sentence(),
             'image' => '/storage/categories/' . fake()->randomElement(['1', '2', '3']) . '.jpg',
             'parent_id' => null,
             'created_at' => Carbon::now()

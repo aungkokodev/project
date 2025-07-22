@@ -15,7 +15,7 @@ class AdminReviewController extends Controller
         $reviews = Review::with(['user', 'product.images'])->latest()->get();
         $total_count = Review::all()->count();
         $recent_count = Review::where('created_at', '>=', Carbon::now()->subDays(30))->count();
-        $pending_count = Review::where('is_approved', '0')->count();
+        $pending_count = Review::where('is_reviewed', '0')->count();
         $approved_count = Review::where('is_approved', '1')->count();
 
         return Inertia::render('Admin/Review/Index', [
@@ -37,14 +37,15 @@ class AdminReviewController extends Controller
     public function approved(Request $request, Review $review)
     {
         $review->update([
-            'is_approved' => $request->is_approved
+            'is_approved' => $request->is_approved,
+            'is_reviewed' => true
         ]);
     }
 
-    // public function flagged(Request $request, Review $review)
-    // {
-    //     $review->update([
-    //         'is_flagged' => $request->is_flagged
-    //     ]);
-    // }
+    public function reviewed(Request $request, Review $review)
+    {
+        $review->update([
+            'is_reviewed' => $request->is_reviewed
+        ]);
+    }
 }

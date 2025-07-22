@@ -1,23 +1,21 @@
 import { router } from "@inertiajs/react";
 
-export default function RemoveFromWishlistButton({ id, children }) {
-    const removeFromWishlist = () => {
+export default function RemoveFromWishlistButton({ productId, children }) {
+    const removeItem = () => {
         router.post(
             "/wishlist/remove",
             {
-                product_id: id,
+                product_id: productId,
                 _method: "post",
             },
             {
                 preserveScroll: true,
-                onSuccess: () => {},
-                onError: () => {},
             }
         );
     };
 
     return (
-        <div onClick={removeFromWishlist} className="cursor-pointer">
+        <div onClick={removeItem} className="cursor-pointer">
             {children}
         </div>
     );

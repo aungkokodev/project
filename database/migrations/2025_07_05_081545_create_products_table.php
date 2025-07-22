@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description');
             $table->decimal('price', 10, 0);
-            $table->integer('stock_quantity')->default(0);
+            $table->integer('stock')->default(0);
             $table->string('unit');
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_active')->default(true);

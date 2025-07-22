@@ -5,18 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
         'category_id',
+        'name',
         'slug',
         'description',
         'price',
-        'stock_quantity',
+        'stock',
         'unit',
         'is_featured',
         'is_active',
@@ -60,8 +61,15 @@ class Product extends Model
     protected static function booted()
     {
         static::creating(function ($product) {
-            $combined = uuid_create() . '-' . $product->name;
-            $product->slug = substr(sha1($combined), 0, 16);
+            $baseSlug = Str::slug($product->name);
+            $slug = $baseSlug;
+            $i = 1;
+
+            while (static::where('slug', $slug)->exists()) {
+                $slug = "{$baseSlug}-" . $i++;
+            }
+
+            $product->slug = $slug;
         });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,31 +49,31 @@ class HandleInertiaRequests extends Middleware
             ],
             'categories' => function () {
                 return Cache::remember('global_categories', now()->addDay(), function () {
-                    return \App\Models\Category::with(['children'])
+                    return Category::with(['children'])
                         ->whereNull('parent_id')
                         ->get();
                 });
             },
+            'cart' => fn() => $this->getCart($request),
+            'wishlist' => fn() =>  $this->getWishlist($request),
             'backUrl' => url()->previous(),
-            'cart' => fn() => $this->getCartData($request),
-            'wishlistCount' => fn() =>  $this->getWishlistCount($request)
 
         ];
     }
 
-    protected function getWishlistCount()
+    protected function getWishlist()
     {
         return  Auth::check()
-            ? Auth::user()->wishlist()->with('image')->get()->count()
+            ? Auth::user()->wishlist()->with(['image', 'category'])->get()
             : collect(session('wishlist', []))->map(function ($id) {
-                return Product::with('image')->find($id);
-            })->count();
+                return Product::with(['image', 'category'])->find($id);
+            })->values()->toArray();
     }
 
-    protected function getCartData(Request $request)
+    protected function getCart(Request $request)
     {
         if ($request->user()) {
-            $cart = $request->user()->cart()->with('items.product.image')->first();
+            $cart = $request->user()->cart()->with(['items.product.image', 'items.product.category'])->first();
             return $cart?->items->map(function ($item) {
                 return [
                     'product' => $item->product,
@@ -83,7 +84,7 @@ class HandleInertiaRequests extends Middleware
 
         return collect($request->session()->get('cart', []))->map(function ($data, $productId) {
             return [
-                'product' => Product::with('image')->find($productId),
+                'product' => Product::with(['image', 'category'])->find($productId),
                 'quantity' => $data['quantity'] ?? 1,
             ];
         })->values()->toArray();

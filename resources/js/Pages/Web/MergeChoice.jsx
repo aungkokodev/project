@@ -1,5 +1,6 @@
+import PrimaryButton from "@/Components/Button/PrimaryButton";
 import Layout from "@/Layouts/Web/Layout";
-import { router } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 
 function MergeChoice() {
     const handleChoice = (action) => {
@@ -7,33 +8,32 @@ function MergeChoice() {
     };
 
     return (
-        <div className="max-w-xl mx-auto p-8 space-y-6">
-            <h1 className="text-2xl font-bold">Cart & Wishlist Conflict</h1>
-            <p className="text-gray-600">
-                Choose how you'd like to resolve conflicting items:
-            </p>
+        <div className="max-w-xl mx-auto p-10 space-y-5">
+            <Head title="Merge" />
+            <h1 className="text-xl font-bold">Cart & Wishlist Conflict</h1>
+            <p>Choose how you'd like to resolve conflicting items:</p>
 
-            <div className="space-y-4">
-                <button
+            <div className="space-y-5">
+                <PrimaryButton
                     onClick={() => handleChoice("merge")}
-                    className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+                    className="w-full"
                 >
                     🔄 Merge Both (recommended)
-                </button>
+                </PrimaryButton>
 
-                <button
+                <PrimaryButton
                     onClick={() => handleChoice("use_session")}
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                    className="w-full"
                 >
                     ♻️ Keep Current (Session) Data
-                </button>
+                </PrimaryButton>
 
-                <button
+                <PrimaryButton
                     onClick={() => handleChoice("keep_db")}
-                    className="w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700"
+                    className="w-full"
                 >
                     📦 Keep My Account Data
-                </button>
+                </PrimaryButton>
             </div>
         </div>
     );

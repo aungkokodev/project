@@ -1,28 +1,25 @@
-import { formatNumber } from "@/utils/formatHelper";
-import {
-    Favorite,
-    FavoriteBorderOutlined,
-    ShoppingCartOutlined,
-} from "@mui/icons-material";
-import { Avatar } from "@mui/material";
+import { usePage } from "@inertiajs/react";
+import { Avatar, Rating } from "@mui/material";
 import clsx from "clsx";
+import { Heart, ShoppingBagIcon } from "lucide-react";
 import AddToCartButton from "../Button/AddToCartButton";
 import AddToWishlistButton from "../Button/AddToWishlistButton";
+import IconButton from "../Button/IconButton";
 import LinkText from "../Common/LinkText";
+import Price from "../Common/Price";
 
-function ProductCard({ product, wishlist }) {
-    const hasStock = product.stock_quantity > 0;
+function ProductCard({ product }) {
+    const { wishlist = [] } = usePage().props;
+
+    const hasStock = product.stock > 0;
+    const hasWishlist = (productId) =>
+        wishlist.some((product) => product.id == productId);
 
     const goToCategory = (slug) => `/collections/${slug}`;
     const goToProduct = (slug) => `/products/${slug}`;
 
     return (
         <div className="h-full flex flex-col items-start gap-2.5 p-5 bg-white border rounded-xl hover:shadow-lg group overflow-hidden transition-all duration-200 ease-in-out relative">
-            {product?.is_featured ? (
-                <div className="absolute top-5 left-5 z-30 bg-green-100 border border-green-600 px-2 py-0.5 rounded-full text-xs text-green-600">
-                    Featured
-                </div>
-            ) : null}
             <LinkText preserveScroll={false} href={goToProduct(product.slug)}>
                 <div className="overflow-hidden w-full aspect-square relative">
                     <Avatar
@@ -40,58 +37,68 @@ function ProductCard({ product, wishlist }) {
                 </div>
             </LinkText>
 
-            <LinkText preserveScroll={false} href={goToProduct(product.slug)}>
-                <p className="font-bold hover:text-green-600 hover:underline">
-                    {product.name}
-                </p>
+            <LinkText
+                preserveScroll={false}
+                href={goToProduct(product.slug)}
+                className="font-bold"
+            >
+                {product.name}
             </LinkText>
 
             <LinkText
                 preserveScroll={false}
                 href={goToCategory(product.category.slug)}
+                className="text-sm"
             >
-                <p className="text-sm hover:text-green-800 hover:underline">
-                    {product.category.name}
-                </p>
+                {product.category.name}
             </LinkText>
 
-            <div className="w-full flex items-center justify-between">
-                <div>
-                    <p className="font-bold">K{formatNumber(product.price)}</p>
-                    {product.compare_at_price && (
-                        <p className="text-xs text-gray-400 line-through">
-                            K{formatNumber(product.compare_at_price)}
-                        </p>
-                    )}
-                </div>
+            <div className="w-full flex items-center justify-between mt-auto">
+                <Price value={product.price} className="font-semibold" />
                 <span
                     className={clsx(
                         "text-xs py-1 px-2 rounded-full",
                         hasStock
-                            ? "text-green-600 bg-green-100"
-                            : "text-red-600 bg-red-100"
+                            ? "text-green-600 bg-green-50"
+                            : "text-red-600 bg-red-50"
                     )}
                 >
                     {hasStock ? "In Stock" : "Out of Stock"}
                 </span>
             </div>
 
-            <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <button className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">
-                    <AddToWishlistButton id={product.id}>
-                        {wishlist?.some((id) => id === product.id) ? (
-                            <Favorite className="text-lg text-red-600 opacity-100" />
+            <div className="flex items-center gap-2.5 text-xs">
+                <Rating
+                    size="small"
+                    value={+product?.reviews_avg_rating}
+                    precision={0.5}
+                    readOnly
+                />
+                <span>({product?.reviews_count} reviews)</span>
+            </div>
+
+            <div className="absolute top-5 right-5">
+                {hasWishlist(product.id) && (
+                    <Heart className="text-green-600" />
+                )}
+            </div>
+
+            <div className="absolute top-5 right-5 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <AddToWishlistButton productId={product.id}>
+                    <IconButton>
+                        {hasWishlist(product.id) ? (
+                            <Heart className="text-green-600" />
                         ) : (
-                            <FavoriteBorderOutlined className="text-lg" />
+                            <Heart />
                         )}
-                    </AddToWishlistButton>
-                </button>
+                    </IconButton>
+                </AddToWishlistButton>
                 {hasStock && (
-                    <button className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">
-                        <AddToCartButton id={product.id}>
-                            <ShoppingCartOutlined className="text-lg" />
-                        </AddToCartButton>
-                    </button>
+                    <AddToCartButton productId={product.id}>
+                        <IconButton>
+                            <ShoppingBagIcon />
+                        </IconButton>
+                    </AddToCartButton>
                 )}
             </div>
 

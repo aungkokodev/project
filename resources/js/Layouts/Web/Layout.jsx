@@ -4,10 +4,10 @@ import TopBar from "./TopBar";
 
 function Layout({ children }) {
     return (
-        <div className="w-full min-h-dvh bg-white text-gray-600">
+        <div className="flex flex-col min-h-screen bg-white text-gray-600">
             <TopBar />
             <NavBar />
-            <main className="min-h-[calc(100vh-192px)]">{children}</main>
+            <main className="flex-1 min-h-screen">{children}</main>
             <Footer />
         </div>
     );

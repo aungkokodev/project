@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -31,5 +30,26 @@ class OrderController extends Controller
         return Inertia::render('Web/OrderConfirmationPage', [
             'order' => $order
         ]);
+    }
+
+    public function cancel(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Only pending orders can be canceled.');
+        }
+
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            $product->increment('stock', $item->quantity);
+        }
+
+        $order->status = 'cancelled';
+        $order->save();
+
+        return redirect('/profile')->with('success', 'Order cancelled successfully. Items restocked.');
     }
 }

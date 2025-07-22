@@ -24,6 +24,7 @@ class ReviewFactory extends Factory
             'product_id' => Product::factory(),
             'rating' => fake()->numberBetween(1, 5),
             'comment' => fake()->paragraph(),
+            'is_reviewed' => fake()->boolean(),
             'is_approved' => fake()->boolean(),
             'created_at' => Carbon::now()
                 ->subDays(rand(0, 90))
