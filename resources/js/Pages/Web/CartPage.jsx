@@ -8,7 +8,11 @@ import Price from "@/Components/Common/Price";
 import Layout from "@/Layouts/Web/Layout";
 import { formatNumber } from "@/utils/formatHelper";
 import { Head, router } from "@inertiajs/react";
-import { ArrowRight, ShoppingCart, Trash2, Truck } from "lucide-react";
+import {
+    ArrowForwardOutlined,
+    DeleteOutline,
+    ShoppingCartOutlined,
+} from "@mui/icons-material";
 
 function CartPage({ cart }) {
     const cartItems = cart || [];
@@ -16,8 +20,8 @@ function CartPage({ cart }) {
         (sum, item) => sum + item.product.price * item.quantity,
         0
     );
-    const shipping = 0;
-    const total = subtotal + shipping;
+
+    const total = subtotal;
 
     return (
         <>
@@ -38,14 +42,15 @@ function CartPage({ cart }) {
                                             <img
                                                 src={item.product.image.path}
                                                 alt={item.product.name}
-                                                className="w-28 h-28 rounded-lg object-cover border"
+                                                className="w-24 h-24 rounded-lg object-cover border"
                                             />
                                         </div>
 
-                                        <div className="flex-1 flex flex-col gap-2">
+                                        <div className="flex-1 flex flex-col gap-1">
                                             <div className="flex justify-between items-center">
                                                 <LinkText
                                                     href={`/products/${item.product.slug}`}
+                                                    className="font-bold"
                                                 >
                                                     {item.product.name}
                                                 </LinkText>
@@ -53,15 +58,15 @@ function CartPage({ cart }) {
                                                 <RemoveFromCartButton
                                                     productId={item.product.id}
                                                 >
-                                                    <IconButton className="text-red-600">
-                                                        <Trash2 />
+                                                    <IconButton className="text-red-600 hover:text-red-800">
+                                                        <DeleteOutline />
                                                     </IconButton>
                                                 </RemoveFromCartButton>
                                             </div>
 
                                             <LinkText
                                                 href={`/collections/${item.product.category.slug}`}
-                                                className="text-sm"
+                                                className="text-sm self-start"
                                             >
                                                 {item.product.category.name}
                                             </LinkText>
@@ -69,7 +74,7 @@ function CartPage({ cart }) {
                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                                 <Price
                                                     value={item.product.price}
-                                                    className="font-semibold"
+                                                    className="font-bold"
                                                 />
 
                                                 <div className="flex items-center gap-4">
@@ -92,9 +97,9 @@ function CartPage({ cart }) {
                         ) : (
                             <div className="flex flex-col items-center justify-center text-center py-16 rounded-xl border">
                                 <div className="p-4 rounded-full mb-5">
-                                    <ShoppingCart className="h-12 w-12 text-gray-400" />
+                                    <ShoppingCartOutlined className="h-12 w-12 text-gray-400" />
                                 </div>
-                                <h3 className="text-2xl font-medium text-gray-900">
+                                <h3 className="text-xl font-medium">
                                     Your cart is empty
                                 </h3>
                                 <p className="mt-2 text-gray-600 max-w-md">
@@ -109,7 +114,7 @@ function CartPage({ cart }) {
                                         className="px-8 py-3"
                                     >
                                         Browse Our Products
-                                        <ArrowRight className="ml-2 w-5 h-5" />
+                                        <ArrowForwardOutlined className="ml-2 w-5 h-5" />
                                     </PrimaryButton>
                                 </div>
                             </div>
@@ -127,25 +132,12 @@ function CartPage({ cart }) {
                                     <span>
                                         Subtotal ({cartItems.length}{" "}
                                         {cartItems.length === 1
-                                            ? "item"
-                                            : "items"}
+                                            ? "product"
+                                            : "products"}
                                         )
                                     </span>
                                     <span className="font-medium text-gray-900">
                                         <Price value={subtotal} />
-                                    </span>
-                                </div>
-
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">
-                                        Shipping
-                                    </span>
-                                    <span className="font-medium text-gray-900">
-                                        {shipping > 0 ? (
-                                            <Price value={shipping} />
-                                        ) : (
-                                            "Free"
-                                        )}
                                     </span>
                                 </div>
 
@@ -170,13 +162,8 @@ function CartPage({ cart }) {
                                 disabled={cartItems.length === 0}
                             >
                                 Proceed to Checkout
-                                <ArrowRight className="ml-2 w-5 h-5" />
+                                <ArrowForwardOutlined className="ml-2 w-5 h-5" />
                             </PrimaryButton>
-
-                            <div className="mt-5 flex items-center gap-2 text-sm">
-                                <Truck className="w-4 h-4" />
-                                <span>Free shipping on orders</span>
-                            </div>
                         </div>
                     </div>
                 </div>

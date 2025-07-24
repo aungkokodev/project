@@ -51,16 +51,18 @@ Route::post('/wishlist/remove', [WishlistController::class, 'remove']);
 Route::get('/about', [PageController::class, 'about']);
 Route::get('/contact', [PageController::class, 'contact']);
 
-Route::get('/checkout', [CheckoutController::class, 'index'])->middleware('auth');
-Route::get('/merge-choice', [MergeController::class, 'index'])->middleware('auth');
-Route::post('/merge-choice/resolve', [MergeController::class, 'resolve'])->middleware('auth');
 
 
 Route::middleware(['auth', 'role:customer'])->group(function () {
+  Route::get('/checkout', [CheckoutController::class, 'index'])->middleware('auth');
+  Route::get('/merge-choice', [MergeController::class, 'index'])->middleware('auth');
+  Route::post('/merge-choice/resolve', [MergeController::class, 'resolve'])->middleware('auth');
+
   Route::get('/profile', [ProfileContorller::class, 'index'])->name('profile');
   Route::post('/profile/{user}', [ProfileContorller::class, 'update']);
 
   Route::post('/reviews', [ReviewController::class, 'store']);
+  Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']);
 
   Route::post('/checkout/process', [CheckoutController::class, 'process']);
 
@@ -105,7 +107,6 @@ Route::prefix('/admin')->middleware(['auth', 'role:admin'])->name('admin.')->gro
 
   Route::get('insights/sales', [AdminReportController::class, 'sales']);
   Route::get('insights/products', [AdminReportController::class, 'products']);
-  // Route::get('insights/customers', [AdminReportController::class, 'customers']);
 });
 
 require __DIR__ . '/auth.php';

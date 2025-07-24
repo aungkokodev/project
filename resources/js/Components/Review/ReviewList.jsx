@@ -20,7 +20,7 @@ function ReviewList({ reviews }) {
                         className="py-5 space-y-2.5 border-b last:border-0"
                     >
                         <div className="flex gap-2.5">
-                            <Avatar src={review.user.image} />
+                            <Avatar src={review.user.avatar} />
                             <div>
                                 <p className="font-medium">
                                     {review.user.name}

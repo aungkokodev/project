@@ -38,7 +38,6 @@ class AddressController extends Controller
     public function update(Request $request, string $id)
     {
         $address = Address::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-
         $validated = $request->validate([
             'fullname'   => 'required|string|max:255',
             'phone'      => 'required|string|max:20',
@@ -66,6 +65,7 @@ class AddressController extends Controller
     public function destroy(string $id)
     {
         $address = Address::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
         $address->delete();
 
         return back()->with('success', 'Address deleted.');

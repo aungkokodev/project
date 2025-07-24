@@ -1,4 +1,5 @@
 import PrimaryButton from "@/Components/Button/PrimaryButton";
+import CardWithHeader from "@/Components/Card/CardWithHeader";
 import Container from "@/Components/Common/Container";
 import Price from "@/Components/Common/Price";
 import Select from "@/Components/Input/Select";
@@ -6,14 +7,19 @@ import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Web/Layout";
 import { formatNumber } from "@/utils/formatHelper";
 import { Head, useForm } from "@inertiajs/react";
+import {
+    AccountBalanceOutlined,
+    AccountBalanceWalletOutlined,
+    FmdGoodOutlined,
+    LocalShippingOutlined,
+    SellOutlined,
+} from "@mui/icons-material";
 import { Checkbox, MenuItem, Radio } from "@mui/material";
 import {
     ArrowRight,
     Banknote,
     CheckCircle,
-    ChevronDown,
     CreditCard,
-    MapPin,
     Plus,
     Tags,
     Truck,
@@ -27,7 +33,7 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
 
     const { data, setData, errors, post, processing } = useForm({
         address_id: defaultId,
-        payment_method: "bank_transfer",
+        payment_method: "cod",
         full_name: "",
         phone: "",
         street: "",
@@ -44,8 +50,7 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
         (sum, item) => sum + item.product.price * item.quantity,
         0
     );
-    const shippingFee = 0;
-    const total = subtotal + shippingFee;
+    const total = subtotal;
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -61,10 +66,10 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
 
     const paymentMethods = [
         {
-            id: "bank_transfer",
-            name: "Bank Transfer",
-            icon: <Banknote />,
-            description: "Direct bank transfer",
+            id: "cod",
+            name: "Cash on Delivery",
+            icon: <Wallet />,
+            description: "Pay when items arrive",
         },
         {
             id: "mobile_money",
@@ -73,10 +78,10 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
             description: "Pay via Mobile Money",
         },
         {
-            id: "cod",
-            name: "Cash on Delivery",
-            icon: <Wallet />,
-            description: "Pay when items arrive",
+            id: "bank_transfer",
+            name: "Bank Transfer",
+            icon: <Banknote />,
+            description: "Direct bank transfer",
         },
     ];
 
@@ -84,25 +89,19 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
         <>
             <Head title="Checkout" />
             <Container className="px-10 py-10">
-                <h1 className="text-xl font-bold text-gray-800 mb-2">
+                <h1 className="text-xl font-bold mb-2.5">
                     Complete Your Order
                 </h1>
-                <div className="text-sm mb-10">
+                <div className="mb-10">
                     Review your items and delivery information
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <div className="space-y-10 lg:col-span-2">
-                        <div className="p-5 rounded-xl border overflow-hidden">
-                            <div className="mb-5 flex items-center gap-2.5">
-                                <div className="p-2 rounded-full bg-green-50 text-green-600">
-                                    <MapPin />
-                                </div>
-                                <h2 className="font-medium text-gray-800">
-                                    Delivery Information
-                                </h2>
-                            </div>
-
+                        <CardWithHeader
+                            title="Delivery Information"
+                            icon={<FmdGoodOutlined />}
+                        >
                             <div>
                                 {addresses.length > 0 && !showForm ? (
                                     <div className="space-y-3">
@@ -116,15 +115,16 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                             }
                                             className="w-full"
                                         >
-                                            {addresses.map((addr) => (
+                                            {addresses.map((address) => (
                                                 <MenuItem
-                                                    key={addr.id}
-                                                    value={addr.id}
+                                                    key={address.id}
+                                                    value={address.id}
                                                 >
-                                                    {addr.label
-                                                        ? `${addr.label}: `
+                                                    {address.label
+                                                        ? `${address.label}: `
                                                         : ""}
-                                                    {addr.street}, {addr.city}
+                                                    {address.street},{" "}
+                                                    {address.city}
                                                 </MenuItem>
                                             ))}
                                         </Select>
@@ -294,26 +294,20 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                     </p>
                                 )}
                             </div>
-                        </div>
+                        </CardWithHeader>
 
-                        <div className="p-5 rounded-xl border overflow-hidden">
-                            <div className="mb-5 flex items-center gap-2.5">
-                                <div className="p-2 rounded-full bg-green-50 text-green-600">
-                                    <Wallet />
-                                </div>
-                                <h2 className="font-medium text-gray-800">
-                                    Payment Method
-                                </h2>
-                            </div>
-
+                        <CardWithHeader
+                            title="Payment Method"
+                            icon={<AccountBalanceWalletOutlined />}
+                        >
                             <div className="space-y-5">
                                 {paymentMethods.map((method) => (
                                     <label
                                         key={method.id}
-                                        className={`flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-all ${
+                                        className={`flex items-start gap-5 p-5 border rounded-xl cursor-pointer transition-all ${
                                             data.payment_method === method.id
                                                 ? "border-green-500 "
-                                                : "border-gray-200 hover:border-gray-300"
+                                                : "hover:border-gray-300"
                                         }`}
                                     >
                                         <div
@@ -321,7 +315,7 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                                 data.payment_method ===
                                                 method.id
                                                     ? "text-green-600"
-                                                    : "text-gray-400"
+                                                    : ""
                                             }`}
                                         >
                                             {method.icon}
@@ -329,10 +323,8 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                         <div className="flex-1">
                                             <div className="flex justify-between">
                                                 <span className="flex flex-col">
-                                                    <span className="font-medium">
-                                                        {method.name}
-                                                    </span>
-                                                    <span className="text-sm">
+                                                    <span>{method.name}</span>
+                                                    <span className="text-sm opacity-80">
                                                         {method.description}
                                                     </span>
                                                 </span>
@@ -349,28 +341,22 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                                             method.id
                                                         )
                                                     }
-                                                    className="p-0 text-green-600 focus:ring-green-500"
+                                                    className="p-0 text-green-600 focus:ring-green-600"
                                                 />
                                             </div>
                                         </div>
                                     </label>
                                 ))}
                             </div>
-                        </div>
+                        </CardWithHeader>
                     </div>
 
                     <div>
-                        <div className="space-y-5 sticky top-24">
-                            <div className="rounded-xl border p-5">
-                                <div className="mb-5 flex items-center gap-2.5">
-                                    <div className="text-green-600">
-                                        <Truck />
-                                    </div>
-                                    <h2 className="font-medium text-gray-800">
-                                        Order Summary
-                                    </h2>
-                                </div>
-
+                        <div className="space-y-10 sticky top-24">
+                            <CardWithHeader
+                                title="Order Summary"
+                                icon={<LocalShippingOutlined />}
+                            >
                                 <div className="space-y-5">
                                     <div className="flex justify-between">
                                         <span className="text-gray-600">
@@ -378,14 +364,6 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                         </span>
                                         <span className="font-medium">
                                             <Price value={subtotal} />
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">
-                                            Shipping
-                                        </span>
-                                        <span className="font-medium">
-                                            <Price value={shippingFee} />
                                         </span>
                                     </div>
                                     <div className="border-t border-gray-200 pt-4 flex justify-between">
@@ -401,7 +379,7 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                 <PrimaryButton
                                     type="submit"
                                     className="w-full mt-6 flex justify-center items-center py-3"
-                                    disabled={processing}
+                                    disabled={processing || total <= 0}
                                     onClick={handleSubmit}
                                 >
                                     {processing ? (
@@ -413,22 +391,12 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                         </>
                                     )}
                                 </PrimaryButton>
+                            </CardWithHeader>
 
-                                <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-500">
-                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                    <span>Secure checkout</span>
-                                </div>
-                            </div>
-
-                            <div className="p-5 rounded-xl border">
-                                <div className="mb-5 flex items-center gap-2.5">
-                                    <div className="text-green-600">
-                                        <Tags />
-                                    </div>
-                                    <h2 className="font-medium text-gray-800">
-                                        Your Items
-                                    </h2>
-                                </div>
+                            <CardWithHeader
+                                title="Your Items"
+                                icon={<SellOutlined />}
+                            >
                                 <div className="space-y-5">
                                     {cart?.map((item) => (
                                         <div
@@ -445,10 +413,10 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                                 />
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-medium text-gray-800 line-clamp-1">
+                                                <p className="line-clamp-1">
                                                     {item.product.name}
-                                                </h4>
-                                                <p className="text-sm">
+                                                </p>
+                                                <p className="text-sm opacity-80">
                                                     {
                                                         item.product.category
                                                             ?.name
@@ -456,21 +424,28 @@ function CheckoutPage({ cart, addresses, defaultAddress }) {
                                                 </p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-sm font-medium">
-                                                    K
-                                                    {formatNumber(
+                                                <Price
+                                                    value={
                                                         item.product.price *
-                                                            item.quantity
-                                                    )}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    Qty: {item.quantity}
+                                                        item.quantity
+                                                    }
+                                                    className="font-bold"
+                                                />
+                                                <p className="text-sm opacity-80 space-x-1">
+                                                    <Price
+                                                        value={
+                                                            item.product.price
+                                                        }
+                                                        className="text-sm opacity-80"
+                                                    />
+                                                    <span>×</span>
+                                                    <span>{item.quantity}</span>
                                                 </p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </CardWithHeader>
                         </div>
                     </div>
                 </div>

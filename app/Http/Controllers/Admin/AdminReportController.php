@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Review;
+use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -33,6 +35,11 @@ class AdminReportController extends Controller
             ->selectRaw('payment_method, COUNT(*) as count')
             ->groupBy('payment_method')
             ->pluck('count', 'payment_method');
+
+        $ratingCounts = Review::whereBetween('reviews.created_at', [$start, $end])
+            ->selectRaw('rating, COUNT(*) as count')
+            ->groupBy('rating')
+            ->pluck('count', 'rating');
 
         $deliveredOrders = Order::whereBetween('orders.created_at', [$start, $end])
             ->where('status', 'delivered');
@@ -96,6 +103,28 @@ class AdminReportController extends Controller
             ->orderByDesc('sales_amount')
             ->get();
 
+        $topCustomers = User::where('role', 'customer')
+            ->withCount(['orders as total_orders' => function ($query) use ($start, $end) {
+                $query
+                    ->whereBetween('created_at', [$start, $end]);
+            }])
+            ->withCount(['orders as cancelled_orders' => function ($query) use ($start, $end) {
+                $query->where('status', 'cancelled')
+                    ->whereBetween('created_at', [$start, $end]);
+            }])
+            ->withSum(['orders as total_spent' => function ($query) use ($start, $end) {
+                $query->where('status', 'delivered')
+                    ->whereBetween('created_at', [$start, $end]);
+            }], 'total_amount')
+            ->with(['orders' => function ($query) use ($start, $end) {
+                $query->where('status', 'delivered')
+                    ->whereBetween('created_at', [$start, $end]);
+            }])
+            ->withAvg(['reviews as avg_rating' => function ($query) {
+                $query->where('is_approved', true);
+            }], 'rating')
+            ->orderByDesc('total_spent')
+            ->get();
 
         return Inertia::render('Admin/Report/Sales', [
             'filters' => [
@@ -110,12 +139,15 @@ class AdminReportController extends Controller
                 'cancel_rate' => $cancelRate,
                 'status_counts' => $statusCounts,
                 'payment_methods' => $paymentMethods,
+                'rating_counts' => $ratingCounts,
             ],
+            'sales' => $this->getDailySalesData($start, $end),
             'top_categories' => $topCategories,
             'top_products' => $topProducts,
-            'sales' => $this->getDailySalesData($start, $end),
-            // 'category_trends' => $this->getCategoryTrends($start, $end),
-            // 'product_trends' => $this->getProductTrends($start, $end),
+            'top_customers' => $topCustomers,
+            'category_trends' => $this->getCategoryTrends($start, $end),
+            'product_trends' => $this->getProductTrends($start, $end),
+
         ]);
     }
 
@@ -173,121 +205,121 @@ class AdminReportController extends Controller
         return $result;
     }
 
-    // protected function getCategoryTrends(Carbon $start, Carbon $end)
-    // {
-    //     $isMonthly = $start->diffInDays($end) > 180;
+    protected function getCategoryTrends(Carbon $start, Carbon $end)
+    {
+        $isMonthly = $start->diffInDays($end) > 180;
 
-    //     $query = Category::with(['orderItems' => function ($query) use ($start, $end) {
-    //         $query->whereHas('order', function ($q) use ($start, $end) {
-    //             $q->where('status', 'delivered')
-    //                 ->whereBetween('created_at', [$start, $end]);
-    //         });
-    //     }])
-    //         ->withCount(['orderItems as sales_count' => function ($query) use ($start, $end) {
-    //             $query->whereHas('order', function ($q) use ($start, $end) {
-    //                 $q->where('status', 'delivered')
-    //                     ->whereBetween('created_at', [$start, $end]);
-    //             });
-    //         }])
-    //         ->orderByDesc('sales_count')
-    //         ->limit(5)
-    //         ->get();
+        $query = Category::with(['orderItems' => function ($query) use ($start, $end) {
+            $query->whereHas('order', function ($q) use ($start, $end) {
+                $q->where('status', 'delivered')
+                    ->whereBetween('created_at', [$start, $end]);
+            });
+        }])
+            ->withCount(['orderItems as sales_count' => function ($query) use ($start, $end) {
+                $query->whereHas('order', function ($q) use ($start, $end) {
+                    $q->where('status', 'delivered')
+                        ->whereBetween('created_at', [$start, $end]);
+                });
+            }])
+            ->orderByDesc('sales_count')
+            ->limit(5)
+            ->get();
 
-    //     $trends = [];
-    //     $period = $isMonthly
-    //         ? CarbonPeriod::create($start, '1 month', $end)
-    //         : CarbonPeriod::create($start, $end);
+        $trends = [];
+        $period = $isMonthly
+            ? CarbonPeriod::create($start, '1 month', $end)
+            : CarbonPeriod::create($start, $end);
 
-    //     foreach ($query as $category) {
-    //         $categoryTrend = [
-    //             'name' => $category->name,
-    //             'data' => []
-    //         ];
+        foreach ($query as $category) {
+            $categoryTrend = [
+                'name' => $category->name,
+                'data' => []
+            ];
 
-    //         foreach ($period as $date) {
-    //             $key = $isMonthly ? $date->format('Y-m') : $date->toDateString();
-    //             $label = $isMonthly ? $date->format('M Y') : $date->format('M d');
+            foreach ($period as $date) {
+                $key = $isMonthly ? $date->format('Y-m') : $date->toDateString();
+                $label = $isMonthly ? $date->format('M Y') : $date->format('M d');
 
-    //             $count = $category->orderItems()
-    //                 ->whereHas('order', function ($q) use ($date, $isMonthly) {
-    //                     if ($isMonthly) {
-    //                         $q->whereMonth('created_at', $date->month)
-    //                             ->whereYear('created_at', $date->year);
-    //                     } else {
-    //                         $q->whereDate('created_at', $date);
-    //                     }
-    //                 })
-    //                 ->count();
+                $count = $category->orderItems()
+                    ->whereHas('order', function ($q) use ($date, $isMonthly) {
+                        if ($isMonthly) {
+                            $q->whereMonth('created_at', $date->month)
+                                ->whereYear('created_at', $date->year);
+                        } else {
+                            $q->whereDate('created_at', $date);
+                        }
+                    })
+                    ->count();
 
-    //             $categoryTrend['data'][] = [
-    //                 'date' => $label,
-    //                 'count' => $count
-    //             ];
-    //         }
+                $categoryTrend['data'][] = [
+                    'date' => $label,
+                    'count' => $count
+                ];
+            }
 
-    //         $trends[] = $categoryTrend;
-    //     }
+            $trends[] = $categoryTrend;
+        }
 
-    //     return $trends;
-    // }
+        return $trends;
+    }
 
-    // protected function getProductTrends(Carbon $start, Carbon $end)
-    // {
-    //     $isMonthly = $start->diffInDays($end) > 180;
+    protected function getProductTrends(Carbon $start, Carbon $end)
+    {
+        $isMonthly = $start->diffInDays($end) > 180;
 
-    //     $query = Product::with(['orderItems' => function ($query) use ($start, $end) {
-    //         $query->whereHas('order', function ($q) use ($start, $end) {
-    //             $q->where('status', 'delivered')
-    //                 ->whereBetween('created_at', [$start, $end]);
-    //         });
-    //     }])
-    //         ->withCount(['orderItems as sales_count' => function ($query) use ($start, $end) {
-    //             $query->whereHas('order', function ($q) use ($start, $end) {
-    //                 $q->where('status', 'delivered')
-    //                     ->whereBetween('created_at', [$start, $end]);
-    //             });
-    //         }])
-    //         ->orderByDesc('sales_count')
-    //         ->limit(5)
-    //         ->get();
+        $query = Product::with(['orderItems' => function ($query) use ($start, $end) {
+            $query->whereHas('order', function ($q) use ($start, $end) {
+                $q->where('status', 'delivered')
+                    ->whereBetween('created_at', [$start, $end]);
+            });
+        }])
+            ->withCount(['orderItems as sales_count' => function ($query) use ($start, $end) {
+                $query->whereHas('order', function ($q) use ($start, $end) {
+                    $q->where('status', 'delivered')
+                        ->whereBetween('created_at', [$start, $end]);
+                });
+            }])
+            ->orderByDesc('sales_count')
+            ->limit(5)
+            ->get();
 
-    //     $trends = [];
-    //     $period = $isMonthly
-    //         ? CarbonPeriod::create($start, '1 month', $end)
-    //         : CarbonPeriod::create($start, $end);
+        $trends = [];
+        $period = $isMonthly
+            ? CarbonPeriod::create($start, '1 month', $end)
+            : CarbonPeriod::create($start, $end);
 
-    //     foreach ($query as $product) {
-    //         $productTrend = [
-    //             'name' => $product->name,
-    //             'data' => []
-    //         ];
+        foreach ($query as $product) {
+            $productTrend = [
+                'name' => $product->name,
+                'data' => []
+            ];
 
-    //         foreach ($period as $date) {
-    //             $key = $isMonthly ? $date->format('Y-m') : $date->toDateString();
-    //             $label = $isMonthly ? $date->format('M Y') : $date->format('M d');
+            foreach ($period as $date) {
+                $key = $isMonthly ? $date->format('Y-m') : $date->toDateString();
+                $label = $isMonthly ? $date->format('M Y') : $date->format('M d');
 
-    //             $count = $product->orderItems()
-    //                 ->whereHas('order', function ($q) use ($date, $isMonthly) {
-    //                     if ($isMonthly) {
-    //                         $q->whereMonth('created_at', $date->month)
-    //                             ->whereYear('created_at', $date->year);
-    //                     } else {
-    //                         $q->whereDate('created_at', $date);
-    //                     }
-    //                 })
-    //                 ->count();
+                $count = $product->orderItems()
+                    ->whereHas('order', function ($q) use ($date, $isMonthly) {
+                        if ($isMonthly) {
+                            $q->whereMonth('created_at', $date->month)
+                                ->whereYear('created_at', $date->year);
+                        } else {
+                            $q->whereDate('created_at', $date);
+                        }
+                    })
+                    ->count();
 
-    //             $productTrend['data'][] = [
-    //                 'date' => $label,
-    //                 'count' => $count
-    //             ];
-    //         }
+                $productTrend['data'][] = [
+                    'date' => $label,
+                    'count' => $count
+                ];
+            }
 
-    //         $trends[] = $productTrend;
-    //     }
+            $trends[] = $productTrend;
+        }
 
-    //     return $trends;
-    // }
+        return $trends;
+    }
 
     public function products()
     {

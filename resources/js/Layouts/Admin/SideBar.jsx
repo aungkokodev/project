@@ -2,15 +2,14 @@ import { Link, usePage } from "@inertiajs/react";
 import {
     DashboardCustomizeOutlined,
     DashboardOutlined,
+    ExpandLess,
+    ExpandMore,
     GrassOutlined,
-    Inventory2Outlined,
     LayersOutlined,
     LeaderboardOutlined,
-    PeopleOutline,
-    PieChartOutline,
+    LogoutOutlined,
     ShoppingCartOutlined,
     StarOutline,
-    TrendingUpOutlined,
     WidgetsOutlined,
 } from "@mui/icons-material";
 import {
@@ -20,17 +19,10 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Menu,
-    MenuItem,
+    Tooltip,
 } from "@mui/material";
 import clsx from "clsx";
-import {
-    ChevronDown,
-    ChevronUp,
-    LogOut,
-    MoreVertical,
-    UserCircle,
-} from "lucide-react";
+// import { ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import { useReducer, useState } from "react";
 
 function LinkOrDiv({ onClick, href, children }) {
@@ -74,7 +66,7 @@ function NavItem({ menu }) {
                     <ListItemText>
                         <span className="text-sm">{menu.text}</span>
                     </ListItemText>
-                    {menu.children && (open ? <ChevronUp /> : <ChevronDown />)}
+                    {menu.children && (open ? <ExpandLess /> : <ExpandMore />)}
                 </ListItemButton>
             </LinkOrDiv>
 
@@ -127,17 +119,21 @@ function Profile() {
                 <p className="text-xs truncate">{user.email}</p>
             </div>
             <div
-                className="py-1.5 border rounded hover:text-gray-800 hover:bg-gray-200 cursor-pointer"
+                className="py-1.5 hover:text-red-800 hover:cursor-pointer"
                 onClick={handleMenuOpen}
                 id="account-options"
                 aria-controls={openMenu ? "account-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={openMenu ? "true" : undefined}
             >
-                <MoreVertical />
+                <Tooltip title="Logout" arrow>
+                    <Link href="/logout" method="post">
+                        <LogoutOutlined />
+                    </Link>
+                </Tooltip>
             </div>
 
-            <Menu
+            {/* <Menu
                 open={openMenu}
                 anchorEl={anchorEl}
                 onClose={handleMenuClose}
@@ -173,7 +169,7 @@ function Profile() {
                         <ListItemText>Logout</ListItemText>
                     </MenuItem>
                 </Link>
-            </Menu>
+            </Menu> */}
         </div>
     );
 }
@@ -222,11 +218,11 @@ function getNavItems() {
                     icon: <WidgetsOutlined fontSize="small" />,
                     url: "/admin/products",
                 },
-                {
-                    text: "Inventory",
-                    icon: <Inventory2Outlined fontSize="small" />,
-                    url: "/admin/inventory",
-                },
+                // {
+                //     text: "Inventory",
+                //     icon: <Inventory2Outlined fontSize="small" />,
+                //     url: "/admin/inventory",
+                // },
                 {
                     text: "Reviews",
                     icon: <StarOutline fontSize="small" />,
@@ -245,25 +241,26 @@ function getNavItems() {
             url: "/admin/orders",
         },
         {
-            text: "Insights",
+            text: "Reports",
             icon: <LeaderboardOutlined fontSize="small" />,
-            children: [
-                {
-                    text: "Sales",
-                    icon: <TrendingUpOutlined fontSize="small" />,
-                    url: "/admin/insights/sales",
-                },
-                // {
-                //     text: "Product",
-                //     icon: <PieChartOutline fontSize="small" />,
-                //     url: "/admin/insights/products",
-                // },
-                // {
-                //     text: "Customer",
-                //     icon: <PieChartOutline fontSize="small" />,
-                //     url: "/admin/insights/customers",
-                // },
-            ],
+            url: "/admin/insights/sales",
+            // children: [
+            // {
+            //     text: "Sales",
+            //     icon: <TrendingUpOutlined fontSize="small" />,
+            //     url: "/admin/insights/sales",
+            // },
+            // {
+            //     text: "Product",
+            //     icon: <PieChartOutline fontSize="small" />,
+            //     url: "/admin/insights/products",
+            // },
+            // {
+            //     text: "Customer",
+            //     icon: <PieChartOutline fontSize="small" />,
+            //     url: "/admin/insights/customers",
+            // },
+            // ],
         },
     ];
 }

@@ -7,7 +7,11 @@ import LinkText from "@/Components/Common/LinkText";
 import Price from "@/Components/Common/Price";
 import Layout from "@/Layouts/Web/Layout";
 import { Head, router, usePage } from "@inertiajs/react";
-import { Heart, ShoppingCart, Trash2 } from "lucide-react";
+import {
+    AddShoppingCartOutlined,
+    DeleteOutline,
+    FavoriteBorderOutlined,
+} from "@mui/icons-material";
 
 function WishlistPage({ wishlist }) {
     const { cart = [] } = usePage().props;
@@ -42,8 +46,8 @@ function WishlistPage({ wishlist }) {
                                     <RemoveFromWishlistButton
                                         productId={item.id}
                                     >
-                                        <IconButton className="absolute top-0 right-0 text-red-600">
-                                            <Trash2 />
+                                        <IconButton className="absolute top-0 right-0 text-red-600 hover:text-red-800">
+                                            <DeleteOutline />
                                         </IconButton>
                                     </RemoveFromWishlistButton>
                                 </div>
@@ -75,7 +79,7 @@ function WishlistPage({ wishlist }) {
                                         }
                                         className="flex items-center gap-2 min-w-auto w-full "
                                     >
-                                        <ShoppingCart />
+                                        <AddShoppingCartOutlined />
                                         Add to Cart
                                     </PrimaryButton>
                                 </AddToCartButton>
@@ -84,7 +88,7 @@ function WishlistPage({ wishlist }) {
                     </div>
                 ) : (
                     <div className="p-10 flex flex-col gap-5 items-center rounded-xl border">
-                        <Heart className="mx-auto h-12 w-12" />
+                        <FavoriteBorderOutlined className="mx-auto h-12 w-12" />
                         <h3 className="text-lg font-medium text-gray-900">
                             Your wishlist is empty
                         </h3>

@@ -1,3 +1,4 @@
+import StatusCardWithHeader from "@/Components/Card/StatusCardWithHeader";
 import LinkText from "@/Components/Common/LinkText";
 import StatusCardWithGraph from "@/Components/StatusCardWithGraph";
 import Layout from "@/Layouts/Admin/Layout";
@@ -16,9 +17,6 @@ import {
     TodayOutlined,
 } from "@mui/icons-material";
 import {
-    Card,
-    CardContent,
-    CardHeader,
     Chip,
     LinearProgress,
     MenuItem,
@@ -165,199 +163,178 @@ function Index({
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-                <Card className="p-5 border rounded-xl overflow-hidden shadow-none lg:col-span-2">
-                    <CardHeader
-                        title="Sales By Category"
-                        subheader="Last 12 months"
-                        avatar={<LayersOutlined />}
-                        className="p-0 mb-5"
-                    />
-                    <CardContent className="h-96 p-0">
-                        <ChartComponent
-                            xAxis={[
-                                {
-                                    data: categorySales.map(
-                                        (item) => item.date
-                                    ),
-                                    scaleType: "band",
-                                },
-                            ]}
-                            series={Object.keys(
-                                categorySales[0].categories
-                            ).map((categoryId) => ({
+                <StatusCardWithHeader
+                    title="Sales By Category"
+                    subheader="Last 12 months"
+                    avatar={<LayersOutlined />}
+                    className="lg:col-span-2"
+                >
+                    <ChartComponent
+                        xAxis={[
+                            {
+                                data: categorySales.map((item) => item.date),
+                                scaleType: "band",
+                            },
+                        ]}
+                        series={Object.keys(categorySales[0].categories).map(
+                            (categoryId) => ({
                                 data: categorySales.map(
                                     (item) => item.categories[categoryId].total
                                 ),
                                 label: categorySales[0].categories[categoryId]
                                     .name,
                                 showMark: false,
-                            }))}
-                            slotProps={{
-                                legend: {
-                                    direction: "row",
-                                    position: {
-                                        vertical: "bottom",
-                                        horizontal: "middle",
-                                    },
+                            })
+                        )}
+                        slotProps={{
+                            legend: {
+                                direction: "row",
+                                position: {
+                                    vertical: "bottom",
+                                    horizontal: "middle",
                                 },
-                            }}
-                        />
-                    </CardContent>
-                </Card>
-
-                <Card className="p-5 border rounded-xl overflow-hidden shadow-none">
-                    <CardHeader
-                        title="Inventory Status"
-                        subheader="Current stock levels"
-                        avatar={<Inventory2Outlined />}
-                        className="p-0 mb-5"
+                            },
+                        }}
                     />
-                    <CardContent className="h-96 p-0">
-                        <PieChart
-                            series={[
-                                {
-                                    data: inventory,
-                                    innerRadius: 25,
-                                    outerRadius: 100,
-                                    paddingAngle: 5,
-                                    cornerRadius: 5,
-                                    highlightScope: {
-                                        fade: "global",
-                                        highlighted: "item",
-                                    },
-                                    faded: {
-                                        innerRadius: 20,
-                                        additionalRadius: -5,
-                                        color: "gray",
-                                    },
+                </StatusCardWithHeader>
+
+                <StatusCardWithHeader
+                    title="Inventory Status"
+                    subheader="Current stock levels"
+                    avatar={<Inventory2Outlined />}
+                >
+                    <PieChart
+                        series={[
+                            {
+                                data: inventory,
+                                innerRadius: 25,
+                                outerRadius: 100,
+                                paddingAngle: 5,
+                                cornerRadius: 5,
+                                highlightScope: {
+                                    fade: "global",
+                                    highlighted: "item",
                                 },
-                            ]}
-                            slotProps={{
-                                legend: {
-                                    direction: "horizontal",
-                                    position: {
-                                        vertical: "bottom",
-                                        horizontal: "middle",
-                                    },
+                                faded: {
+                                    innerRadius: 20,
+                                    additionalRadius: -5,
+                                    color: "gray",
                                 },
-                            }}
-                        />
-                    </CardContent>
-                </Card>
+                            },
+                        ]}
+                        slotProps={{
+                            legend: {
+                                direction: "horizontal",
+                                position: {
+                                    vertical: "bottom",
+                                    horizontal: "middle",
+                                },
+                            },
+                        }}
+                    />
+                </StatusCardWithHeader>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                <Card className="p-5 border rounded-xl overflow-hidden lg:col-span-2 shadow-none">
-                    <CardHeader
-                        title="Recent Orders"
-                        subheader="Latest transactions"
-                        avatar={<ShoppingCartOutlined />}
-                        action={
-                            <LinkText
-                                href="/admin/orders"
-                                className="text-sm me-3"
-                            >
-                                View All
-                            </LinkText>
-                        }
-                        className="p-0 mb-5"
-                    />
-                    <CardContent className="p-0">
-                        <DataGrid
-                            columns={[
-                                {
-                                    field: "order_number",
-                                    headerName: "Order Number",
-                                    headerClassName: "bg-gray-100 uppercase",
-                                    flex: 1,
-                                },
-                                {
-                                    field: "user",
-                                    headerName: "Customer",
-                                    headerClassName: "bg-gray-100 uppercase",
-                                    flex: 1,
-                                    valueGetter: (user) => user?.name,
-                                },
-                                {
-                                    field: "total_amount",
-                                    headerName: "Amount",
-                                    headerClassName: "bg-gray-100 uppercase",
-                                    flex: 1,
-                                    valueFormatter: (v) =>
-                                        `K${formatNumber(v)}`,
-                                },
-                                {
-                                    field: "status",
-                                    headerName: "Status",
-                                    headerClassName: "bg-gray-100 uppercase",
-                                    flex: 1,
-                                    renderCell: ({ value }) => (
-                                        <Chip
-                                            label={value}
-                                            size="small"
-                                            color={
-                                                value === "pending"
-                                                    ? "warning"
-                                                    : value === "shipped"
-                                                    ? "info"
-                                                    : value === "delivered"
-                                                    ? "success"
-                                                    : "error"
-                                            }
-                                        />
-                                    ),
-                                },
-                            ]}
-                            rows={recentOrders}
-                            hideFooterPagination
-                            disableColumnMenu
-                            disableColumnSorting
-                            disableRowSelectionOnClick
-                            className="rounded-xl border-0"
-                            sx={{}}
-                        />
-                    </CardContent>
-                </Card>
-
-                <Card className="p-5 border rounded-xl shadow-none">
-                    <CardHeader
-                        title="Top Products"
-                        subheader="By sales volume"
-                        avatar={<StarOutline />}
-                        className="p-0 mb-5"
-                    />
-                    <CardContent className="p-0 space-y-5">
-                        {topProducts?.map((product, index) => (
-                            <div
-                                className="flex items-start gap-2.5"
-                                key={product.id}
-                            >
-                                <div className="flex flex-col gap-1 flex-1">
-                                    <LinkText
-                                        href={`/admin/products/${product.slug}`}
-                                        className="text-sm font-bold"
-                                    >
-                                        {product.name}
-                                    </LinkText>
-                                    <div className="text-sm flex justify-between">
-                                        <p>{product.sales_count} sold</p>
-                                        <p className="font-bold">
-                                            K{formatNumber(product.sales_total)}
-                                        </p>
-                                    </div>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={
-                                            (product.sales_total / maxSales) *
-                                            100
+                <StatusCardWithHeader
+                    title="Recent Orders"
+                    subheader="Latest transactions"
+                    avatar={<ShoppingCartOutlined />}
+                    action={
+                        <LinkText href="/admin/orders" className="text-sm me-3">
+                            View All
+                        </LinkText>
+                    }
+                    className="lg:col-span-2"
+                >
+                    <DataGrid
+                        columns={[
+                            {
+                                field: "order_number",
+                                headerName: "Order Number",
+                                headerClassName: "bg-gray-100 uppercase",
+                                flex: 1,
+                            },
+                            {
+                                field: "user",
+                                headerName: "Customer",
+                                headerClassName: "bg-gray-100 uppercase",
+                                flex: 1,
+                                valueGetter: (user) => user?.name,
+                            },
+                            {
+                                field: "total_amount",
+                                headerName: "Amount",
+                                headerClassName: "bg-gray-100 uppercase",
+                                flex: 1,
+                                valueFormatter: (v) => `K${formatNumber(v)}`,
+                            },
+                            {
+                                field: "status",
+                                headerName: "Status",
+                                headerClassName: "bg-gray-100 uppercase",
+                                flex: 1,
+                                renderCell: ({ value }) => (
+                                    <Chip
+                                        label={value}
+                                        size="small"
+                                        color={
+                                            value === "pending"
+                                                ? "warning"
+                                                : value === "shipped"
+                                                ? "info"
+                                                : value === "delivered"
+                                                ? "success"
+                                                : "error"
                                         }
-                                        className="w-full h-2 rounded-full"
                                     />
+                                ),
+                            },
+                        ]}
+                        rows={recentOrders}
+                        hideFooterPagination
+                        disableColumnMenu
+                        disableColumnSorting
+                        disableRowSelectionOnClick
+                        className="rounded-xl border-0"
+                        sx={{}}
+                    />
+                </StatusCardWithHeader>
+
+                <StatusCardWithHeader
+                    title="Top Products"
+                    subheader="By sales volume"
+                    avatar={<StarOutline />}
+                >
+                    {topProducts?.map((product, index) => (
+                        <div
+                            className="flex items-start gap-2.5"
+                            key={product.id}
+                        >
+                            <div className="flex flex-col gap-1 flex-1">
+                                <LinkText
+                                    href={`/admin/products/${product.slug}`}
+                                    className="text-sm font-bold"
+                                >
+                                    {product.name}
+                                </LinkText>
+                                <div className="text-sm flex justify-between">
+                                    <p>{product.sales_count} sold</p>
+                                    <p className="font-bold">
+                                        K{formatNumber(product.sales_total)}
+                                    </p>
                                 </div>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={
+                                        (product.sales_total / maxSales) * 100
+                                    }
+                                    className="w-full h-2 rounded-full"
+                                />
                             </div>
-                        ))}
-                    </CardContent>
-                </Card>
+                        </div>
+                    ))}
+                </StatusCardWithHeader>
             </div>
         </>
     );

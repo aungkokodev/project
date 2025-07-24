@@ -32,13 +32,11 @@ class ProfileContorller extends Controller
         $validated = request()->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar' => 'nullable',
         ]);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->phone = $validated['phone'];
 
         if (request()->hasFile('avatar')) {
             if ($user->avatar) {

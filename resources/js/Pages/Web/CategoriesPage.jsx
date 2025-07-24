@@ -4,8 +4,8 @@ import Container from "@/Components/Common/Container";
 import Select from "@/Components/Input/Select";
 import Layout from "@/Layouts/Web/Layout";
 import { Head, router } from "@inertiajs/react";
+import { HomeOutlined } from "@mui/icons-material";
 import { MenuItem, Pagination } from "@mui/material";
-import { Home } from "lucide-react";
 import CategoryMenu from "./CategoryMenu";
 
 function SortMenu({ value, onChange }) {
@@ -118,7 +118,7 @@ export default CategoriesPage;
 
 function getBreadcrumbsData(category) {
     const data = [
-        { label: "Home", url: "/", icon: <Home size="20" /> },
+        { label: "Home", url: "/", icon: <HomeOutlined size="20" /> },
         { label: "All", url: "/collections" },
     ];
 

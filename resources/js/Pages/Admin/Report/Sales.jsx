@@ -7,16 +7,19 @@ import { formatNumber } from "@/utils/formatHelper";
 import { router } from "@inertiajs/react";
 import {
     AddBoxOutlined,
-    BarChartOutlined,
+    HomeOutlined,
+    LayersOutlined,
+    LeaderboardOutlined,
     MonetizationOnOutlined,
     PaymentOutlined,
     PercentOutlined,
+    PersonOutline,
     ShoppingCartOutlined,
-    StarOutline,
-    TimelineOutlined,
+    StarBorderOutlined,
     TrendingUpOutlined,
+    WidgetsOutlined,
 } from "@mui/icons-material";
-import { Rating, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Rating } from "@mui/material";
 import { LineChart, PieChart } from "@mui/x-charts";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -29,6 +32,7 @@ function Sales({
     sales,
     top_categories,
     top_products,
+    top_customers,
     ...props
 }) {
     const [startDate, setStartDate] = useState(
@@ -57,7 +61,7 @@ function Sales({
     return (
         <>
             <div className="flex gap-5 items-center mb-5">
-                <h1 className="text-xl font-bold me-auto">Sales</h1>
+                <h1 className="text-xl font-bold me-auto">Reports</h1>
 
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <label>Start Date:</label>
@@ -83,7 +87,7 @@ function Sales({
                     />
                 </LocalizationProvider>
 
-                <ToggleButtonGroup
+                {/* <ToggleButtonGroup
                     value={chartType}
                     onChange={(_, value) => {
                         if (value !== null) return setChartType(value);
@@ -97,7 +101,7 @@ function Sales({
                     <ToggleButton value="bar">
                         <BarChartOutlined />
                     </ToggleButton>
-                </ToggleButtonGroup>
+                </ToggleButtonGroup> */}
             </div>
 
             <div className="grid grid-cols-4 gap-5 mb-5">
@@ -165,7 +169,6 @@ function Sales({
                                     (key) => {
                                         const value =
                                             metrics.status_counts[key];
-                                        console.log(value);
                                         return {
                                             label: key,
                                             value: value,
@@ -209,7 +212,7 @@ function Sales({
                 <StatusCardWithHeader
                     title="Top Categories"
                     subheader={timeLabel}
-                    avatar={<StarOutline />}
+                    avatar={<LayersOutlined />}
                     className="col-span-2"
                 >
                     <CustomDataGrid
@@ -240,11 +243,11 @@ function Sales({
                                 ),
                                 flex: 1,
                             },
-                            {
-                                field: "sales_count",
-                                headerName: "Counts",
-                                valueFormatter: (value) => formatNumber(value),
-                            },
+                            // {
+                            //     field: "sales_count",
+                            //     headerName: "Sales Count",
+                            //     valueFormatter: (value) => formatNumber(value),
+                            // },
                             {
                                 field: "sales_amount",
                                 headerName: "Sales",
@@ -254,12 +257,12 @@ function Sales({
                     />
                 </StatusCardWithHeader>
             </div>
-            {console.log(top_products)}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
                 <StatusCardWithHeader
                     title="Top Products"
                     subheader={timeLabel}
-                    avatar={<StarOutline />}
+                    avatar={<WidgetsOutlined />}
                     className="col-span-2"
                 >
                     <CustomDataGrid
@@ -300,11 +303,11 @@ function Sales({
                                 headerName: "Sales",
                                 valueFormatter: (value) => formatNumber(value),
                             },
-                            {
-                                field: "reviews_count",
-                                headerName: "Review Count",
-                                valueFormatter: (value) => formatNumber(value),
-                            },
+                            // {
+                            //     field: "reviews_count",
+                            //     headerName: "Review Count",
+                            //     valueFormatter: (value) => formatNumber(value),
+                            // },
                             {
                                 field: "reviews_avg_rating",
                                 headerName: "Avg Rating",
@@ -312,7 +315,7 @@ function Sales({
                                 renderCell: ({ row, value }) => (
                                     <div>
                                         <Rating
-                                            value={value}
+                                            value={+value}
                                             precision={0.5}
                                             readOnly
                                         />
@@ -335,7 +338,6 @@ function Sales({
                                     (key) => {
                                         const value =
                                             metrics.payment_methods[key];
-                                        console.log(value);
                                         return {
                                             label: key,
                                             value: value,
@@ -369,10 +371,141 @@ function Sales({
                     />
                 </StatusCardWithHeader>
             </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+                <StatusCardWithHeader
+                    title="Rating Status"
+                    subheader={timeLabel}
+                    avatar={<StarBorderOutlined />}
+                >
+                    <PieChart
+                        series={[
+                            {
+                                data: Object.keys(metrics.rating_counts).map(
+                                    (key) => {
+                                        const value =
+                                            metrics.rating_counts[key];
+                                        return {
+                                            label: key + " stars",
+                                            value: value,
+                                        };
+                                    }
+                                ),
+                                innerRadius: 25,
+                                outerRadius: 100,
+                                paddingAngle: 5,
+                                cornerRadius: 5,
+                                highlightScope: {
+                                    fade: "global",
+                                    highlighted: "item",
+                                },
+                                faded: {
+                                    innerRadius: 20,
+                                    additionalRadius: -5,
+                                    color: "gray",
+                                },
+                            },
+                        ]}
+                        slotProps={{
+                            legend: {
+                                direction: "horizontal",
+                                position: {
+                                    vertical: "bottom",
+                                    horizontal: "middle",
+                                },
+                            },
+                        }}
+                    />
+                </StatusCardWithHeader>
+                <StatusCardWithHeader
+                    title="Top Customers"
+                    subheader={timeLabel}
+                    avatar={<PersonOutline />}
+                    className="col-span-2"
+                >
+                    <CustomDataGrid
+                        rows={top_customers}
+                        showToolbar={false}
+                        hideFooter={true}
+                        initialState={{
+                            pagination: null,
+                        }}
+                        columns={[
+                            {
+                                field: "id",
+                                headerName: "#",
+                                valueGetter: (id) =>
+                                    top_customers?.findIndex(
+                                        (c) => c.id === id
+                                    ) + 1,
+                                width: 64,
+                            },
+                            {
+                                field: "name",
+                                headerName: "Customer Name",
+                                renderCell: ({ row }) => (
+                                    <DataCell
+                                        avatar={row.avatar || "no image"}
+                                        text={row.name}
+                                        avatarVariant="circle"
+                                    />
+                                ),
+                                flex: 1,
+                            },
+                            {
+                                field: "total_orders",
+                                headerName: "Total Order",
+                                valueFormatter: (value) => formatNumber(value),
+                            },
+                            {
+                                field: "cancelled_orders",
+                                headerName: "Cancelled Order",
+                                valueFormatter: (value) => formatNumber(value),
+                            },
+                            {
+                                field: "total_spent",
+                                headerName: "Total Spent",
+                                valueFormatter: (value) => formatNumber(value),
+                            },
+                            {
+                                field: "avg_rating",
+                                headerName: "Avg Rating",
+                                renderCell: ({ row, value }) => (
+                                    <div>
+                                        <Rating
+                                            value={+value}
+                                            precision={0.5}
+                                            readOnly
+                                        />
+                                    </div>
+                                ),
+                                flex: 0.5,
+                            },
+                        ]}
+                    />
+                </StatusCardWithHeader>
+            </div>
         </>
     );
 }
 
-Sales.layout = (page) => <Layout children={page} />;
+Sales.layout = (page) => (
+    <Layout
+        children={page}
+        title="Reports"
+        breadcrumbs={[
+            {
+                label: "Dashboard",
+                url: "/admin/dashboard",
+                icon: <HomeOutlined />,
+            },
+            {
+                label: "Reports",
+                url: "/admin/insights/sales",
+                icon: <LeaderboardOutlined />,
+            },
+        ]}
+    />
+);
 
 export default Sales;

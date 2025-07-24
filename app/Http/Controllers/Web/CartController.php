@@ -134,16 +134,4 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
     }
-
-    // public function syncWithDatabase($user, $sessionCart)
-    // {
-    //     $user->cart()->items()->delete();
-
-    //     foreach ($sessionCart as $productId => $item) {
-    //         $user->cart()->items()->create([
-    //             'product_id' => $productId,
-    //             'quantity' => $item['quantity']
-    //         ]);
-    //     }
-    // }
 }

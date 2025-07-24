@@ -46,8 +46,6 @@ class DatabaseSeeder extends Seeder
 
         require('category.php');
 
-
-
         foreach ($categories as $categoryData) {
             $mainCategory = Category::factory()->create([
                 "name" => $categoryData["name"],

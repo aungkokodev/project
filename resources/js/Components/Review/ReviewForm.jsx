@@ -1,14 +1,14 @@
 import PrimaryButton from "@/Components/Button/PrimaryButton";
 import TextField from "@/Components/Input/TextField";
 import { Link, router, useForm, usePage } from "@inertiajs/react";
+import { LoginOutlined } from "@mui/icons-material";
 import { Rating } from "@mui/material";
-import { LogIn } from "lucide-react";
 
 function ReviewForm({ productId }) {
     const page = usePage();
     const auth = page.props.auth;
 
-    const { data, setData, post, errors, reset } = useForm({
+    const { data, setData, post, errors } = useForm({
         product_id: productId,
         rating: 1,
         comment: "",
@@ -32,7 +32,7 @@ function ReviewForm({ productId }) {
                         label="comment"
                         value={data.comment}
                         onChange={(e) => setData("comment", e.target.value)}
-                        error={errors.comment}
+                        error={!!errors.comment}
                         helperText={errors.comment}
                     />
                     <PrimaryButton
@@ -66,7 +66,7 @@ function ReviewForm({ productId }) {
                         onClick={() => router.visit("/login")}
                         className="w-50 inline-flex items-center justify-center gap-2"
                     >
-                        <LogIn className="w-4 h-4" />
+                        <LoginOutlined className="w-4 h-4" />
                         Login
                     </PrimaryButton>
                 </>

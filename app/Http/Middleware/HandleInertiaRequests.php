@@ -60,33 +60,86 @@ class HandleInertiaRequests extends Middleware
 
         ];
     }
-
     protected function getWishlist()
     {
-        return  Auth::check()
-            ? Auth::user()->wishlist()->with(['image', 'category'])->get()
-            : collect(session('wishlist', []))->map(function ($id) {
-                return Product::with(['image', 'category'])->find($id);
-            })->values()->toArray();
+        return Auth::check()
+            ? Auth::user()->wishlist()
+            ->where('is_active', true)
+            ->with(['image', 'category'])
+            ->get()
+            : collect(session('wishlist', []))
+            ->map(function ($id) {
+                return Product::with(['image', 'category'])
+                    ->where('is_active', true)
+                    ->find($id);
+            })
+            ->filter()
+            ->values()
+            ->toArray();
     }
 
     protected function getCart(Request $request)
     {
         if ($request->user()) {
-            $cart = $request->user()->cart()->with(['items.product.image', 'items.product.category'])->first();
-            return $cart?->items->map(function ($item) {
-                return [
-                    'product' => $item->product,
-                    'quantity' => $item->quantity,
-                ];
-            })->values()->toArray() ?? [];
+            $cart = $request->user()->cart()
+                ->with(['items.product' => function ($query) {
+                    $query->where('is_active', true)
+                        ->with(['image', 'category']);
+                }])
+                ->first();
+
+            return $cart?->items
+                ->filter(fn($item) => $item->product !== null)
+                ->map(function ($item) {
+                    return [
+                        'product' => $item->product,
+                        'quantity' => $item->quantity,
+                    ];
+                })
+                ->values()
+                ->toArray() ?? [];
         }
 
-        return collect($request->session()->get('cart', []))->map(function ($data, $productId) {
-            return [
-                'product' => Product::with(['image', 'category'])->find($productId),
-                'quantity' => $data['quantity'] ?? 1,
-            ];
-        })->values()->toArray();
+        return collect($request->session()->get('cart', []))
+            ->map(function ($data, $productId) {
+                return [
+                    'product' => Product::with(['image', 'category'])
+                        ->where('is_active', true)
+                        ->find($productId),
+                    'quantity' => $data['quantity'] ?? 1,
+                ];
+            })
+            ->filter(fn($item) => $item['product'] !== null)
+            ->values()
+            ->toArray();
     }
+
+    // protected function getWishlist()
+    // {
+    //     return  Auth::check()
+    //         ? Auth::user()->wishlist()->with(['image', 'category'])->get()
+    //         : collect(session('wishlist', []))->map(function ($id) {
+    //             return Product::with(['image', 'category'])->find($id);
+    //         })->values()->toArray();
+    // }
+
+    // protected function getCart(Request $request)
+    // {
+    //     if ($request->user()) {
+    //         $cart = $request->user()->cart()->with(['items.product.image', 'items.product.category'])->first();
+    //         return $cart?->items->map(function ($item) {
+    //             return [
+    //                 'product' => $item->product,
+    //                 'quantity' => $item->quantity,
+    //             ];
+    //         })->values()->toArray() ?? [];
+    //     }
+
+    //     return collect($request->session()->get('cart', []))->map(function ($data, $productId) {
+    //         return [
+    //             'product' => Product::with(['image', 'category'])->find($productId),
+    //             'quantity' => $data['quantity'] ?? 1,
+    //         ];
+    //     })->values()->toArray();
+    // }
 }

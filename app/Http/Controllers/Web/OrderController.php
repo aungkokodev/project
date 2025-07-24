@@ -25,7 +25,7 @@ class OrderController extends Controller
             abort(403);
         }
 
-        $order->load(['user', 'items.product.image', 'shippingAddress', 'billingAddress']);
+        $order->load(['user', 'items.product.image', 'items.product.category', 'shippingAddress', 'billingAddress']);
 
         return Inertia::render('Web/OrderConfirmationPage', [
             'order' => $order

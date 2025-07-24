@@ -35,7 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $status = $e->getStatusCode();
             }
 
-            if (in_array($status, [401, 403, 404, 419, 429, 503])) {
+            if (in_array($status, [401, 403, 404, 405, 419, 429, 503])) {
                 return Inertia::render("Errors/Error", [
                     'status' => $status,
                     'message' => $e->getMessage(),

@@ -1,7 +1,7 @@
 import IconButton from "@/Components/Button/IconButton";
 import { router, usePage } from "@inertiajs/react";
+import { FavoriteBorderOutlined } from "@mui/icons-material";
 import { Badge } from "@mui/material";
-import { Heart } from "lucide-react";
 
 function TopBarWishlist() {
     const { wishlist = [] } = usePage().props;
@@ -11,7 +11,7 @@ function TopBarWishlist() {
     return (
         <Badge badgeContent={wishlist.length} color="success" showZero>
             <IconButton onClick={goToWishlist}>
-                <Heart />
+                <FavoriteBorderOutlined />
             </IconButton>
         </Badge>
     );

@@ -7,6 +7,7 @@ function StatusCardWithHeader({
     avatar,
     children,
     className,
+    action,
 }) {
     return (
         <Card
@@ -19,6 +20,7 @@ function StatusCardWithHeader({
                 title={title}
                 subheader={subheader}
                 avatar={avatar}
+                action={action}
                 className="p-0 mb-5"
             />
             <CardContent className="h-96 p-0">{children}</CardContent>

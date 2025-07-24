@@ -1,7 +1,7 @@
 import { formatNumber } from "@/utils/formatHelper";
 
 function Price({ value, className }) {
-    return <p className={className}>K{formatNumber(value)}</p>;
+    return <span className={className}>K{formatNumber(value)}</span>;
 }
 
 export default Price;

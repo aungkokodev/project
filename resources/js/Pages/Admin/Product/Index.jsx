@@ -344,7 +344,9 @@ function getColumns(data, onDetails) {
                         title="Edit"
                         color="green"
                         onClick={() =>
-                            router.visit(`/admin/products/${row.slug}/edit`)
+                            router.visit(`/admin/products/${row.slug}/edit`, {
+                                preserveState: true,
+                            })
                         }
                     />
                     {/* <IconWithTooltip

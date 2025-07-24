@@ -1,6 +1,6 @@
 import PrimaryButton from "@/Components/Button/PrimaryButton";
+import CustomDataGrid from "@/Components/Common/CustomDataGrid";
 import DataCell from "@/Components/Common/DataCell";
-import EmptyDataGrid from "@/Components/EmptyDataGrid";
 import IconWithTooltip from "@/Components/IconWithTooltip";
 import StatusCard from "@/Components/StatusCard";
 import Layout from "@/Layouts/Admin/Layout";
@@ -18,14 +18,12 @@ import {
     VisibilityOutlined,
 } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Chip, Tab } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { Tab } from "@mui/material";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import Create from "./Create";
 import Edit from "./Edit";
 import Show from "./Show";
-import CustomDataGrid from "@/Components/Common/CustomDataGrid";
 
 function Index({ main_categories, sub_categories, counts }) {
     const [activeTab, setActiveTab] = useState("main");
@@ -102,7 +100,8 @@ function Index({ main_categories, sub_categories, counts }) {
                             (data) => {
                                 setCurrentCategory(data);
                                 setOpenEdit(true);
-                            }
+                            },
+                            true
                         )}
                     />
                 </TabPanel>
@@ -126,7 +125,8 @@ function Index({ main_categories, sub_categories, counts }) {
                             (data) => {
                                 setCurrentCategory(data);
                                 setOpenEdit(true);
-                            }
+                            },
+                            false
                         )}
                     />
                 </TabPanel>
@@ -182,7 +182,7 @@ Index.layout = (page) => (
 
 export default Index;
 
-function getColumns(data, onDetails, onEdit) {
+function getColumns(data, onDetails, onEdit, isMain) {
     return [
         {
             field: "id",
@@ -199,19 +199,24 @@ function getColumns(data, onDetails, onEdit) {
             ),
             flex: 1,
         },
-        {
-            field: "parent",
-            headerName: "Parent Category",
-            valueGetter: (value) => value?.name,
-            flex: 1,
-        },
-        {
-            field: "children",
-            headerName: "Subs",
-            valueGetter: (value) => value?.length,
-            renderCell: ({ row }) =>
-                row?.children ? <DataCell text={row.children.length} /> : "",
-        },
+        isMain
+            ? {
+                  field: "children",
+                  headerName: "Sub Categories",
+                  valueGetter: (value) => value?.length,
+                  renderCell: ({ row }) =>
+                      row?.children ? (
+                          <DataCell text={row.children.length} />
+                      ) : (
+                          ""
+                      ),
+              }
+            : {
+                  field: "parent",
+                  headerName: "Parent Category",
+                  valueGetter: (value) => value?.name,
+                  flex: 1,
+              },
         {
             field: "products_count",
             headerName: "Products",

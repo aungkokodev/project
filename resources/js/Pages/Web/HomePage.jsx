@@ -3,8 +3,14 @@ import ProductCard from "@/Components/Card/ProductCard";
 import Container from "@/Components/Common/Container";
 import Layout from "@/Layouts/Web/Layout";
 import { Head, Link, router } from "@inertiajs/react";
+import {
+    ArrowForward,
+    BoltOutlined,
+    StarOutline,
+    UpdateOutlined,
+    WorkspacePremiumOutlined,
+} from "@mui/icons-material";
 import { Avatar, Rating } from "@mui/material";
-import { ArrowRight, Award, Clock, Star, Zap } from "lucide-react";
 
 function HomePage({
     categories,
@@ -19,18 +25,21 @@ function HomePage({
         <div>
             <Head title="Home" />
 
-            <section className="relative h-[90vh] min-h-[600px] overflow-hidden bg-green-700 bg-[url('/storage/assets/hero.jpg')] bg-cover bg-center">
+            <section className="relative h-[90vh] overflow-hidden bg-green-700 bg-[url('/storage/assets/hero.jpg')] bg-cover bg-center">
                 <Container className="h-full flex flex-col gap-10 items-center justify-center text-center relative px-5">
-                    <h1 className="font-bold text-5xl md:text-6xl text-white leading-tight drop-shadow-lg">
-                        Quality Supplies for Small Farms
+                    <h1 className="font-bold text-4xl text-white leading-tight">
+                        Empowering Small Farms, Every Day
                     </h1>
-                    <p className="text-white/90 text-xl md:text-2xl max-w-2xl drop-shadow-lg">
-                        Everything your small farm needs, all in one place.
-                        Premium quality at affordable prices.
+                    <p className="text-white text-xl">
+                        Affordable, reliable supplies to help your farm grow.
+                        <br />
+                        Quality products, fair prices, and support you can
+                        trust.
                     </p>
+
                     <PrimaryButton onClick={() => router.visit("/collections")}>
                         Browse Products
-                        <ArrowRight className="ml-2" />
+                        <ArrowForward className="ml-2" />
                     </PrimaryButton>
                 </Container>
             </section>
@@ -38,12 +47,12 @@ function HomePage({
             <section>
                 <Container className="py-10 px-10">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-3">
                             Shop By Category
                         </h2>
                         <p className="text-gray-600 max-w-2xl mx-auto">
-                            Explore our wide range of farm supplies organized by
-                            category for easy browsing
+                            Explorpe our wide range of farm supplies organized
+                            by category for easy browsing
                         </p>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
@@ -75,21 +84,21 @@ function HomePage({
                     <div className="flex justify-between items-end mb-10">
                         <div>
                             <div className="flex items-center gap-2 mb-2">
-                                <Zap className="text-green-600" />
+                                <BoltOutlined className="text-green-600" />
                                 <span className="text-sm font-semibold text-green-600">
                                     FEATURED
                                 </span>
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-900">
+                            <h2 className="text-2xl font-bold text-gray-900">
                                 Featured Products
                             </h2>
                         </div>
-                        <Link
+                        {/* <Link
                             href="/collections"
                             className="text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
                         >
                             View all <ArrowRight />
-                        </Link>
+                        </Link> */}
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
                         {featured.map((p) => (
@@ -108,21 +117,21 @@ function HomePage({
                     <div className="flex justify-between items-end mb-10">
                         <div>
                             <div className="flex items-center gap-2 mb-2">
-                                <Award className="text-green-600" />
+                                <WorkspacePremiumOutlined className="text-green-600" />
                                 <span className="text-sm font-semibold text-green-600">
                                     TOP RATED
                                 </span>
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-900">
+                            <h2 className="text-2xl font-bold text-gray-900">
                                 Top Rated Products
                             </h2>
                         </div>
-                        <Link
+                        {/* <Link
                             href="/collections"
                             className="text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
                         >
                             View all <ArrowRight />
-                        </Link>
+                        </Link> */}
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
                         {topRated.map((p) => (
@@ -141,21 +150,21 @@ function HomePage({
                     <div className="flex justify-between items-end mb-10">
                         <div>
                             <div className="flex items-center gap-2 mb-2">
-                                <Clock className="text-green-600" />
+                                <UpdateOutlined className="text-green-600" />
                                 <span className="text-sm font-semibold text-green-600">
                                     NEW
                                 </span>
                             </div>
-                            <h2 className="text-3xl font-bold text-gray-900">
+                            <h2 className="text-2xl font-bold text-gray-900">
                                 New Arrivals
                             </h2>
                         </div>
-                        <Link
+                        {/* <Link
                             href="/collections"
                             className="text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
                         >
                             View all <ArrowRight />
-                        </Link>
+                        </Link> */}
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
                         {newArrivals.map((p) => (
@@ -173,17 +182,16 @@ function HomePage({
                 <Container className="px-10 py-10">
                     <div className="text-center mb-12">
                         <div className="flex items-center justify-center gap-2 mb-2">
-                            <Star className="text-green-600" size={20} />
+                            <StarOutline className="text-green-600" size={20} />
                             <span className="text-sm font-semibold text-green-600">
                                 REVIEWS
                             </span>
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-3">
                             Trusted by Customers
                         </h2>
                         <p className="text-gray-600 max-w-2xl mx-auto">
-                            Hear what our customers say about our products and
-                            service
+                            Hear what our customers say about our supplies
                         </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -211,7 +219,7 @@ function HomePage({
                                             {r.user.name}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            Verified Customer
+                                            Customer
                                         </p>
                                     </div>
                                 </div>
@@ -223,16 +231,16 @@ function HomePage({
 
             <section className="bg-gray-50">
                 <Container className="flex flex-col items-center gap-5 px-10 py-10 text-center">
-                    <h2 className="text-3xl font-bold">
+                    <h2 className="text-2xl font-bold">
                         Ready to Upgrade Your Farm?
                     </h2>
                     <p className="text-lg max-w-2xl">
-                        Join thousands of satisfied customers who trust us for
-                        their farm supplies
+                        Join our satisfied customers who trust us for their farm
+                        supplies
                     </p>
-                    <PrimaryButton onClick={() => router.visit("collections")}>
+                    <PrimaryButton onClick={() => router.visit("/collections")}>
                         Shop Now
-                        <ArrowRight />
+                        <ArrowForward />
                     </PrimaryButton>
                 </Container>
             </section>

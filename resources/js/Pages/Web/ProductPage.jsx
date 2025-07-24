@@ -10,8 +10,13 @@ import ReviewForm from "@/Components/Review/ReviewForm";
 import ReviewList from "@/Components/Review/ReviewList";
 import Layout from "@/Layouts/Web/Layout";
 import { Head, usePage } from "@inertiajs/react";
+import {
+    Favorite,
+    FavoriteBorderOutlined,
+    HomeOutlined,
+    ShoppingCartOutlined,
+} from "@mui/icons-material";
 import { Rating } from "@mui/material";
-import { Heart, Home, ShoppingCart } from "lucide-react";
 
 function ProductPage({ product }) {
     const { cart = [], wishlist = [] } = usePage().props;
@@ -44,44 +49,47 @@ function ProductPage({ product }) {
                         precision={0.5}
                         value={+product?.reviews_avg_rating}
                     />
-                    <span className="text-sm opacity-80">
+                    <span className="text-sm">
                         ({product?.reviews_count} reviews)
                     </span>
                 </div>
                 <div className="grid grid-cols-[80px_1fr] gap-5">
-                    <h3 className="font-bold opacity-80">Category</h3>
+                    <h3 className="font-bold">Category</h3>
                     <LinkText href={`/collections/${product.category.slug}`}>
                         {product.category.name}
                     </LinkText>
                 </div>
                 <div className="grid grid-cols-[80px_1fr] gap-5">
-                    <h3 className="font-bold opacity-80">Stock</h3>
+                    <h3 className="font-bold">Stock</h3>
                     <p>
-                        {product.stock} <span>({product.unit})</span>
+                        {product.stock}{" "}
+                        <span className="text-sm">({product.unit})</span>
                     </p>
                 </div>
                 <div className="grid grid-cols-[80px_1fr] gap-5">
-                    <h3 className="font-bold opacity-80">Price</h3>
+                    <h3 className="font-bold">Price</h3>
                     <Price value={product.price} />
                 </div>
                 <div className="flex gap-5">
                     <AddToCartButton productId={product.id} disabled={disabled}>
                         <PrimaryButton disabled={disabled}>
-                            <ShoppingCart />
+                            <ShoppingCartOutlined />
                             Add To Cart
                         </PrimaryButton>
                     </AddToCartButton>
                     <AddToWishlistButton productId={product.id}>
                         <PrimaryButton variant="outlined">
-                            <Heart
-                                className={hasWishlist ? "fill-green-600" : ""}
-                            />
+                            {hasWishlist ? (
+                                <Favorite />
+                            ) : (
+                                <FavoriteBorderOutlined />
+                            )}
                             {hasWishlist ? "Remove From" : "Add To"} Wishlist
                         </PrimaryButton>
                     </AddToWishlistButton>
                 </div>
                 <div className="space-y-2.5">
-                    <h3 className="font-bold opacity-80">Description</h3>
+                    <h3 className="font-bold">Description</h3>
                     <p
                         className="whitespace-pre-line"
                         dangerouslySetInnerHTML={{
@@ -91,7 +99,7 @@ function ProductPage({ product }) {
                 </div>
             </div>
             <div className="col-span-full p-5">
-                <h3 className="font-bold opacity-80 py-5">Reviews</h3>
+                <h3 className="font-bold py-5">Reviews</h3>
                 <ReviewForm productId={product.id} />
                 <ReviewList reviews={product?.reviews} />
             </div>
@@ -105,7 +113,7 @@ export default ProductPage;
 
 function getBreadcrumbsData(product) {
     const data = [
-        { label: "Home", url: "/", icon: <Home size="20" /> },
+        { label: "Home", url: "/", icon: <HomeOutlined size="20" /> },
         { label: "All", url: "/collections" },
     ];
 

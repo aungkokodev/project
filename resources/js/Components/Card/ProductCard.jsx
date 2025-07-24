@@ -1,7 +1,11 @@
 import { usePage } from "@inertiajs/react";
-import { Avatar, Rating } from "@mui/material";
+import {
+    AddShoppingCartOutlined,
+    FavoriteBorderOutlined,
+    FavoriteOutlined,
+} from "@mui/icons-material";
+import { Avatar, Chip, Rating } from "@mui/material";
 import clsx from "clsx";
-import { Heart, ShoppingBagIcon } from "lucide-react";
 import AddToCartButton from "../Button/AddToCartButton";
 import AddToWishlistButton from "../Button/AddToWishlistButton";
 import IconButton from "../Button/IconButton";
@@ -20,6 +24,16 @@ function ProductCard({ product }) {
 
     return (
         <div className="h-full flex flex-col items-start gap-2.5 p-5 bg-white border rounded-xl hover:shadow-lg group overflow-hidden transition-all duration-200 ease-in-out relative">
+            {product.is_featured ? (
+                <Chip
+                    label="Seller's Choice"
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    className="absolute top-5 left-5 z-10 text-xs bg-green-50"
+                />
+            ) : null}
+
             <LinkText preserveScroll={false} href={goToProduct(product.slug)}>
                 <div className="overflow-hidden w-full aspect-square relative">
                     <Avatar
@@ -54,7 +68,7 @@ function ProductCard({ product }) {
             </LinkText>
 
             <div className="w-full flex items-center justify-between mt-auto">
-                <Price value={product.price} className="font-semibold" />
+                <Price value={product.price} className="font-bold" />
                 <span
                     className={clsx(
                         "text-xs py-1 px-2 rounded-full",
@@ -79,7 +93,7 @@ function ProductCard({ product }) {
 
             <div className="absolute top-5 right-5">
                 {hasWishlist(product.id) && (
-                    <Heart className="text-green-600" />
+                    <FavoriteOutlined className="text-green-600" />
                 )}
             </div>
 
@@ -87,26 +101,20 @@ function ProductCard({ product }) {
                 <AddToWishlistButton productId={product.id}>
                     <IconButton>
                         {hasWishlist(product.id) ? (
-                            <Heart className="text-green-600" />
+                            <FavoriteBorderOutlined className="text-green-600" />
                         ) : (
-                            <Heart />
+                            <FavoriteBorderOutlined />
                         )}
                     </IconButton>
                 </AddToWishlistButton>
                 {hasStock && (
                     <AddToCartButton productId={product.id}>
                         <IconButton>
-                            <ShoppingBagIcon />
+                            <AddShoppingCartOutlined />
                         </IconButton>
                     </AddToCartButton>
                 )}
             </div>
-
-            {product.discount_percent > 0 && (
-                <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
-                    -{product.discount_percent}%
-                </div>
-            )}
         </div>
     );
 }

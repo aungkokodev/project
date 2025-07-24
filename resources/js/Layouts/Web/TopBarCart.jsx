@@ -5,8 +5,13 @@ import RemoveFromCartButton from "@/Components/Button/RemoveFromCartButton";
 import LinkText from "@/Components/Common/LinkText";
 import Price from "@/Components/Common/Price";
 import { router, usePage } from "@inertiajs/react";
+import {
+    CloseOutlined,
+    DeleteOutline,
+    ShoppingCartCheckoutOutlined,
+    ShoppingCartOutlined,
+} from "@mui/icons-material";
 import { Badge, Drawer } from "@mui/material";
-import { ShoppingBag, ShoppingCart, Trash2, X } from "lucide-react";
 import { useState } from "react";
 
 function TopBarCart() {
@@ -36,7 +41,7 @@ function TopBarCart() {
         <>
             <Badge badgeContent={count} showZero color="success">
                 <IconButton onClick={handleOpen}>
-                    <ShoppingBag />
+                    <ShoppingCartOutlined />
                 </IconButton>
             </Badge>
 
@@ -44,12 +49,12 @@ function TopBarCart() {
                 <div className="w-xs md:w-sm lg:w-md h-full flex flex-col bg-white text-gray-600">
                     <header className="h-16 px-5 flex gap-5 items-center border-b">
                         <IconButton onClick={goToCart}>
-                            <ShoppingCart />
+                            <ShoppingCartOutlined />
                         </IconButton>
                         <h2>Shopping Cart</h2>
                         <span className="me-auto">({count})</span>
                         <IconButton onClick={handleClose}>
-                            <X className="transition-transform duration-300 hover:rotate-180" />
+                            <CloseOutlined />
                         </IconButton>
                     </header>
 
@@ -67,30 +72,37 @@ function TopBarCart() {
                                             className="w-16 h-16 object-cover"
                                         />
                                         <div className="flex-1 flex flex-col gap-1 justify-between">
+                                            <div className="flex items-start justify-between">
+                                                <LinkText
+                                                    href={`/products/${product.slug}`}
+                                                    className="font-bold"
+                                                >
+                                                    {product.name}
+                                                </LinkText>
+                                                <RemoveFromCartButton
+                                                    productId={product.id}
+                                                >
+                                                    <IconButton className="text-red-600 hover:text-red-800">
+                                                        <DeleteOutline />
+                                                    </IconButton>
+                                                </RemoveFromCartButton>
+                                            </div>
                                             <LinkText
-                                                href={`/products/${product.slug}`}
-                                                className="font-bold"
+                                                href={`/collections/${product.category?.slug}`}
+                                                className="text-sm self-start"
                                             >
-                                                {product.name}
+                                                {product.category?.name}
                                             </LinkText>
-                                            <div className="flex items-center gap-2.5">
-                                                <span className="me-auto">
-                                                    <Price
-                                                        value={product.price}
-                                                    />
-                                                </span>
+                                            <div className="flex items-center justify-between">
+                                                <Price
+                                                    value={product.price}
+                                                    className="font-bold"
+                                                />
                                                 <CartUpdateButton
                                                     productId={product.id}
                                                     quantity={quantity}
                                                     stock={product.stock}
                                                 />
-                                                <RemoveFromCartButton
-                                                    productId={product.id}
-                                                >
-                                                    <IconButton className="text-red-600">
-                                                        <Trash2 />
-                                                    </IconButton>
-                                                </RemoveFromCartButton>
                                             </div>
                                         </div>
                                     </div>
@@ -98,7 +110,7 @@ function TopBarCart() {
                             </div>
                         ) : (
                             <div className="h-full flex flex-col gap-5 items-center justify-center">
-                                <ShoppingCart className="w-20 h-20 text-gray-300" />
+                                <ShoppingCartOutlined className="w-20 h-20 text-gray-300" />
                                 <p>Shopping cart is empty</p>
                                 <PrimaryButton onClick={handleClose}>
                                     Continue Shopping
@@ -117,6 +129,7 @@ function TopBarCart() {
                                 className="block w-full"
                                 onClick={goToCheckout}
                             >
+                                <ShoppingCartCheckoutOutlined />
                                 Proceed to Checkout
                             </PrimaryButton>
                             <PrimaryButton

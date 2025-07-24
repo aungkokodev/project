@@ -5,7 +5,7 @@ function IconButton({ className, ...props }) {
         <button
             {...props}
             className={clsx(
-                "className='w-6 h-6 cursor-pointer hover:brightness-50 active:brightness-90 transition disabled:cursor-not-allowed disabled:opacity-25",
+                "className='w-6 h-6 cursor-pointer hover:text-green-600 active:brightness-50 transition disabled:cursor-not-allowed disabled:opacity-25",
                 className
             )}
         />

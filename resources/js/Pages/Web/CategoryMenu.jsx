@@ -1,5 +1,6 @@
 import IconButton from "@/Components/Button/IconButton";
 import LinkText from "@/Components/Common/LinkText";
+import { AddOutlined, RemoveOutlined } from "@mui/icons-material";
 import {
     Avatar,
     Collapse,
@@ -8,7 +9,6 @@ import {
     ListItemAvatar,
     ListItemText,
 } from "@mui/material";
-import { Minus, Plus } from "lucide-react";
 import { Fragment, useState } from "react";
 
 function CategoryMenu({ categories }) {
@@ -41,7 +41,11 @@ function CategoryMenu({ categories }) {
                         </ListItemText>
                         {category?.children?.length > 0 && (
                             <IconButton onClick={() => handleOpen(category.id)}>
-                                {current === category.id ? <Minus /> : <Plus />}
+                                {current === category.id ? (
+                                    <RemoveOutlined />
+                                ) : (
+                                    <AddOutlined />
+                                )}
                             </IconButton>
                         )}
                     </ListItem>

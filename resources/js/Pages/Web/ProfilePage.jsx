@@ -1,11 +1,14 @@
+import IconButton from "@/Components/Button/IconButton";
 import { default as PrimaryButton } from "@/Components/Button/PrimaryButton";
 import Container from "@/Components/Common/Container";
+import LinkText from "@/Components/Common/LinkText";
 import FormImageInput from "@/Components/Input/FormImageInput";
 import Select from "@/Components/Input/Select";
 import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Web/Layout";
 import { formatNumber, getDate } from "@/utils/formatHelper";
 import { Head, router, useForm } from "@inertiajs/react";
+import { DeleteOutline } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
     Avatar,
@@ -20,14 +23,10 @@ import {
     ChevronDown,
     ChevronRight,
     LogOut,
-    Mail,
     MapPin,
     Package,
     Pencil,
-    Phone,
-    Plus,
     Star,
-    Trash2,
     X,
 } from "lucide-react";
 import { useState } from "react";
@@ -57,17 +56,23 @@ function ProfilePage({ user }) {
         }
     };
 
-    //
+    const handleReviewDelete = (reviewId) => {
+        if (confirm("Delete this review?")) {
+            router.delete(`/reviews/${reviewId}`, {
+                preserveScroll: true,
+                onSuccess: () => router.reload(),
+            });
+        }
+    };
+
     const { addresses = [], orders = [], reviews = [] } = user;
 
     const [editProfile, setEditProfile] = useState(false);
     const { data, setData, errors, post, reset } = useForm({
         name: user.name,
         email: user.email,
-        phone: user.phone || "",
         avatar: user.avatar || "",
     });
-    console.log(data.avatar);
 
     const logout = () => router.post("/logout");
 
@@ -89,6 +94,7 @@ function ProfilePage({ user }) {
     return (
         <Container className="px-10 py-10 space-y-5">
             <Head title="My Profile" />
+
             <div className="flex gap-5 items-center">
                 <div className="relative">
                     {editProfile ? (
@@ -115,16 +121,7 @@ function ProfilePage({ user }) {
                 </div>
                 <div>
                     <h2 className="text-lg font-bold">{user.name}</h2>
-                    <div className="flex gap-5">
-                        <p className="flex gap-2.5 items-center">
-                            <Mail size={16} />
-                            {user.email}
-                        </p>
-                        <p className="flex gap-2.5 items-center">
-                            <Phone size={16} />
-                            {user.phone}
-                        </p>
-                    </div>
+                    <p>{user.email}</p>
                 </div>
                 <div className="flex gap-5 ms-auto">
                     <PrimaryButton
@@ -164,16 +161,6 @@ function ProfilePage({ user }) {
                         error={!!errors.email}
                         helperText={errors.email}
                     />
-                    <TextField
-                        required
-                        type="tel"
-                        value={data.phone}
-                        onChange={(e) => setData("phone", e.target.value)}
-                        label="Phone"
-                        placeholder="Your phone"
-                        error={!!errors.phone}
-                        helperText={errors.phone}
-                    />
                     <PrimaryButton onClick={updateProfile}>
                         Save Changes
                     </PrimaryButton>
@@ -196,16 +183,16 @@ function ProfilePage({ user }) {
                             disableRipple
                         />
                         <Tab
-                            value="addresses"
-                            label="Addresses"
-                            icon={<MapPin />}
+                            value="reviews"
+                            label="My Reveiws"
+                            icon={<Star />}
                             iconPosition="start"
                             disableRipple
                         />
                         <Tab
-                            value="reviews"
-                            label="My Reveiws"
-                            icon={<Star />}
+                            value="addresses"
+                            label="Addresses"
+                            icon={<MapPin />}
                             iconPosition="start"
                             disableRipple
                         />
@@ -256,6 +243,11 @@ function ProfilePage({ user }) {
                                                 size="small"
                                                 variant="outlined"
                                             />
+                                            {order?.admin_notes && (
+                                                <p className="text-sm opacity-80">
+                                                    {order.admin_notes}
+                                                </p>
+                                            )}
                                         </div>
                                         <p className="font-light text-sm text-gray-500">
                                             {getDate(order.created_at)} • K
@@ -426,11 +418,53 @@ function ProfilePage({ user }) {
                         ))
                     )}
                 </TabPanel>
+                <TabPanel value="reviews" className="p-0">
+                    {reviews.length === 0 ? (
+                        <div className="border rounded-xl p-10 flex flex-col gap-2.5 items-center">
+                            <Star size={48} />
+                            <p className="font-bold text-lg">No reviews yet</p>
+                            <p> Your reviews will appear here</p>
+                        </div>
+                    ) : (
+                        reviews.map((review) => (
+                            <div
+                                key={review.id}
+                                className="p-5 mb-5 border rounded-xl space-y-2"
+                            >
+                                <div className="flex justify-between items-center">
+                                    <LinkText
+                                        href={`/products/${review.product.slug}`}
+                                        className="font-bold"
+                                    >
+                                        {review.product.name}
+                                    </LinkText>
+                                    <span className="flex items-center gap-5">
+                                        <Rating
+                                            value={review.rating}
+                                            readOnly
+                                        />
+                                        <IconButton
+                                            onClick={() =>
+                                                handleReviewDelete(review.id)
+                                            }
+                                        >
+                                            <DeleteOutline className="hover:text-red-800" />
+                                        </IconButton>
+                                    </span>
+                                </div>
+                                <p>{review.comment}</p>
+                                <span className="text-xs opacity-50">
+                                    Reviewed on {getDate(review.updated_at)}
+                                </span>
+                            </div>
+                        ))
+                    )}
+                </TabPanel>
                 <TabPanel value="addresses" className="p-0">
-                    <PrimaryButton className="ms-auto mb-5">
+                    {/* <PrimaryButton className="ms-auto mb-5">
                         <Plus />
                         Add New Address
-                    </PrimaryButton>
+                    </PrimaryButton> */}
                     {addresses.length === 0 ? (
                         <div className="border rounded-xl p-10 flex flex-col gap-2.5 items-center">
                             <MapPin size={48} />
@@ -460,7 +494,7 @@ function ProfilePage({ user }) {
                                             )}
                                         </h3>
                                         <div className="flex gap-2">
-                                            <button
+                                            <IconButton
                                                 onClick={() =>
                                                     setEditingAddress(
                                                         editingAddress ===
@@ -472,17 +506,7 @@ function ProfilePage({ user }) {
                                                 className="text-gray-500 hover:text-gray-700"
                                             >
                                                 <Pencil className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDeleteAddress(
-                                                        address.id
-                                                    )
-                                                }
-                                                className="text-gray-500 hover:text-red-500"
-                                            >
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
+                                            </IconButton>
                                         </div>
                                     </div>
 
@@ -499,7 +523,10 @@ function ProfilePage({ user }) {
                                         />
                                     ) : (
                                         <>
-                                            <p>{address.full_name}</p>
+                                            <p>{address.fullname}</p>
+                                            <p className="mb-2">
+                                                {address.phone}
+                                            </p>
                                             <p>{address.street}</p>
                                             <p>
                                                 {address.city}, {address.state}
@@ -508,41 +535,11 @@ function ProfilePage({ user }) {
                                                 {address.country}{" "}
                                                 {address.zip_code}
                                             </p>
-                                            <p className="mt-2 text-sm text-gray-500">
-                                                {address.phone}
-                                            </p>
                                         </>
                                     )}
                                 </div>
                             ))}
                         </div>
-                    )}
-                </TabPanel>
-                <TabPanel value="reviews" className="p-0">
-                    {reviews.length === 0 ? (
-                        <div className="border rounded-xl p-10 flex flex-col gap-2.5 items-center">
-                            <Star size={48} />
-                            <p className="font-bold text-lg">No reviews yet</p>
-                            <p> Your reviews will appear here</p>
-                        </div>
-                    ) : (
-                        reviews.map((review) => (
-                            <div
-                                key={review.id}
-                                className="p-5 mb-5 border rounded-xl space-y-1"
-                            >
-                                <div className="flex justify-between items-start">
-                                    <h3 className="font-bold">
-                                        {review.product.name}
-                                    </h3>
-                                    <Rating value={review.rating} readOnly />
-                                </div>
-                                <p className="text-sm">
-                                    Reviewed on {getDate(review.updated_at)}
-                                </p>
-                                <p>{review.comment}</p>
-                            </div>
-                        ))
                     )}
                 </TabPanel>
             </TabContext>
@@ -552,20 +549,21 @@ function ProfilePage({ user }) {
 
 function AddressEditForm({ address, onCancel, onSuccess }) {
     const { data, setData, errors, post } = useForm({
-        full_name: address.fullname,
-        phone: address.phone,
-        street: address.street,
-        city: address.city,
-        state: address.state,
-        zip_code: address.zip_code,
-        country: address.country,
+        fullname: address.fullname || "",
+        phone: address.phone || "",
+        street: address.street || "",
+        city: address.city || "",
+        state: address.state || "",
+        zip_code: address.zip_code || "",
+        country: address.country || "",
         is_default: address.is_default,
         label: address.label || "",
+        type: "shipping",
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(`/addresses/${address.id}/update`);
+        post(`/addresses/${address.id}/update`, { onSuccess });
     };
 
     return (
@@ -587,10 +585,10 @@ function AddressEditForm({ address, onCancel, onSuccess }) {
                     type="text"
                     label="Full Name"
                     placeholder="Steve"
-                    value={data.full_name}
-                    onChange={(e) => setData("full_name", e.target.value)}
+                    value={data.fullname}
+                    onChange={(e) => setData("fullname", e.target.value)}
                     error={!!errors.full_name}
-                    helperText={errors.full_name}
+                    helperText={errors.fullname}
                 />
                 <TextField
                     required
@@ -651,7 +649,7 @@ function AddressEditForm({ address, onCancel, onSuccess }) {
                 </Select>
                 <label className="col-span-full">
                     <Checkbox
-                        checked={data.is_default}
+                        checked={!!data.is_default}
                         onChange={(e) =>
                             setData("is_default", e.target.checked)
                         }

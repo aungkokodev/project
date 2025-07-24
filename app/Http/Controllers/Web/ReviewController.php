@@ -33,7 +33,17 @@ class ReviewController extends Controller
         return back()->with('success', 'Review submitted.');
     }
 
-    public function update(Request $request, string $id) {}
+    public function destroy(Review $review)
+    {
+        if (Auth::id() !== $review->user_id) {
+            return back()->with('error', 'You are not authorized to delete this review.');
+        }
 
-    public function destroy(string $id) {}
+        try {
+            $review->delete();
+            return back()->with('success', 'Review deleted successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to delete review. Please try again.');
+        }
+    }
 }
