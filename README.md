@@ -64,10 +64,10 @@ php artisan key:generate
 php artisan migrate
 ```
 
-8. Build frontend assets:
+8.  Seed the database:
 
 ```bash
-npm run dev
+php artisan db:seed
 ```
 
 9. Start the development server:
@@ -79,11 +79,3 @@ composer run dev
 10. Visit the app in your browser at [http://localhost:8000](http://localhost:8000)
 
 ---
-
-## Optional Commands
-
--   Seed the database:
-
-```bash
-php artisan db:seed
-```
