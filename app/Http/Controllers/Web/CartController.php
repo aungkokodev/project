@@ -25,6 +25,8 @@ class CartController extends Controller
 
     public function add(Request $request)
     {
+        if (Auth::user()?->role === 'admin') return;
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1'

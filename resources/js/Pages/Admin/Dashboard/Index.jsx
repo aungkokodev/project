@@ -303,21 +303,18 @@ function Index({
 
                 <StatusCardWithHeader
                     title="Top Products"
-                    subheader="By sales volume"
+                    subheader="By all time sales volume"
                     avatar={<StarOutline />}
                 >
                     {topProducts?.map((product, index) => (
                         <div
-                            className="flex items-start gap-2.5"
+                            className="flex items-start gap-2.5 mb-5"
                             key={product.id}
                         >
                             <div className="flex flex-col gap-1 flex-1">
-                                <LinkText
-                                    href={`/admin/products/${product.slug}`}
-                                    className="text-sm font-bold"
-                                >
+                                <p className="text-sm font-bold">
                                     {product.name}
-                                </LinkText>
+                                </p>
                                 <div className="text-sm flex justify-between">
                                     <p>{product.sales_count} sold</p>
                                     <p className="font-bold">

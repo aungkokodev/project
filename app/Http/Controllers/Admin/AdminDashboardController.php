@@ -36,20 +36,43 @@ class AdminDashboardController extends Controller
 
     protected function getTopProducts()
     {
-        return Product::query()
-            ->select([
-                'products.*',
-                DB::raw('SUM(order_items.quantity) as sales_count'),
-                DB::raw('SUM(order_items.quantity * order_items.price) as sales_total')
-            ])
-            ->join('order_items', 'order_items.product_id', '=', 'products.id')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->where('orders.status', 'delivered')
-            ->groupBy('products.id')
+        return Product::withSum(['orderItems as sales_count' => function ($query) {
+            $query->whereHas('order', function ($q) {
+                $q->where('status', 'delivered');
+            });
+        }], 'quantity')
+            ->withSum(['orderItems as sales_total' => function ($query) {
+                $query->whereHas('order', function ($q) {
+                    $q->where('status', 'delivered');
+                });
+            }], DB::raw('order_items.price * order_items.quantity'))
+            ->withAvg(['reviews as reviews_avg_rating' => function ($q) {
+                $q->where('is_approved', true);
+            }], 'rating')
+            ->withCount(['reviews as reviews_count' => function ($q) {
+                $q->where('is_approved', true);
+            }])
+            ->with('image')
             ->orderByDesc('sales_total')
             ->take(5)
             ->get();
     }
+    // protected function getTopProducts()
+    // {
+    //     return Product::query()
+    //         ->select([
+    //             'products.*',
+    //             DB::raw('SUM(order_items.quantity) as sales_count'),
+    //             DB::raw('SUM(order_items.quantity * order_items.price) as sales_total')
+    //         ])
+    //         ->join('order_items', 'order_items.product_id', '=', 'products.id')
+    //         ->join('orders', 'order_items.order_id', '=', 'orders.id')
+    //         ->where('orders.status', 'delivered')
+    //         ->groupBy('products.id')
+    //         ->orderByDesc('sales_total')
+    //         ->take(5)
+    //         ->get();
+    // }
 
     protected function getMetricData(string $metricType)
     {

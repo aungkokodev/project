@@ -107,7 +107,7 @@ function Sales({
             <div className="grid grid-cols-4 gap-5 mb-5">
                 <StatusCard
                     title="Sales"
-                    value={formatNumber(metrics.total_sales)}
+                    value={"K" + formatNumber(metrics.total_sales)}
                     icon={<TrendingUpOutlined />}
                 />
                 <StatusCard
@@ -327,53 +327,6 @@ function Sales({
                     />
                 </StatusCardWithHeader>
                 <StatusCardWithHeader
-                    title="Payment Methods"
-                    subheader={timeLabel}
-                    avatar={<PaymentOutlined />}
-                >
-                    <PieChart
-                        series={[
-                            {
-                                data: Object.keys(metrics.payment_methods).map(
-                                    (key) => {
-                                        const value =
-                                            metrics.payment_methods[key];
-                                        return {
-                                            label: key,
-                                            value: value,
-                                        };
-                                    }
-                                ),
-                                innerRadius: 25,
-                                outerRadius: 100,
-                                paddingAngle: 5,
-                                cornerRadius: 5,
-                                highlightScope: {
-                                    fade: "global",
-                                    highlighted: "item",
-                                },
-                                faded: {
-                                    innerRadius: 20,
-                                    additionalRadius: -5,
-                                    color: "gray",
-                                },
-                            },
-                        ]}
-                        slotProps={{
-                            legend: {
-                                direction: "horizontal",
-                                position: {
-                                    vertical: "bottom",
-                                    horizontal: "middle",
-                                },
-                            },
-                        }}
-                    />
-                </StatusCardWithHeader>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-                <StatusCardWithHeader
                     title="Rating Status"
                     subheader={timeLabel}
                     avatar={<StarBorderOutlined />}
@@ -417,11 +370,58 @@ function Sales({
                         }}
                     />
                 </StatusCardWithHeader>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+                {/* <StatusCardWithHeader
+                    title="Payment Methods"
+                    subheader={timeLabel}
+                    avatar={<PaymentOutlined />}
+                >
+                    <PieChart
+                        series={[
+                            {
+                                data: Object.keys(metrics.payment_methods).map(
+                                    (key) => {
+                                        const value =
+                                            metrics.payment_methods[key];
+                                        return {
+                                            label: key,
+                                            value: value,
+                                        };
+                                    }
+                                ),
+                                innerRadius: 25,
+                                outerRadius: 100,
+                                paddingAngle: 5,
+                                cornerRadius: 5,
+                                highlightScope: {
+                                    fade: "global",
+                                    highlighted: "item",
+                                },
+                                faded: {
+                                    innerRadius: 20,
+                                    additionalRadius: -5,
+                                    color: "gray",
+                                },
+                            },
+                        ]}
+                        slotProps={{
+                            legend: {
+                                direction: "horizontal",
+                                position: {
+                                    vertical: "bottom",
+                                    horizontal: "middle",
+                                },
+                            },
+                        }}
+                    />
+                </StatusCardWithHeader> */}
                 <StatusCardWithHeader
                     title="Top Customers"
                     subheader={timeLabel}
                     avatar={<PersonOutline />}
-                    className="col-span-2"
+                    className="col-span-full"
                 >
                     <CustomDataGrid
                         rows={top_customers}

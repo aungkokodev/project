@@ -2,10 +2,12 @@ import ProductCard from "@/Components/Card/ProductCard";
 import Breadcrumbs from "@/Components/Common/Breadcrumbs";
 import Container from "@/Components/Common/Container";
 import Select from "@/Components/Input/Select";
+import TextField from "@/Components/Input/TextField";
 import Layout from "@/Layouts/Web/Layout";
 import { Head, router } from "@inertiajs/react";
-import { HomeOutlined } from "@mui/icons-material";
-import { MenuItem, Pagination } from "@mui/material";
+import { HomeOutlined, SearchOutlined } from "@mui/icons-material";
+import { InputAdornment, MenuItem, Pagination } from "@mui/material";
+import { useEffect, useState } from "react";
 import CategoryMenu from "./CategoryMenu";
 
 function SortMenu({ value, onChange }) {
@@ -14,7 +16,7 @@ function SortMenu({ value, onChange }) {
             onChange={onChange}
             value={value}
             size="small"
-            className="rounded-lg w-50 text-inherit"
+            className="w-50 text-inherit"
         >
             <MenuItem className="py-2" value="newest">
                 Newest
@@ -38,14 +40,59 @@ function SortMenu({ value, onChange }) {
     );
 }
 
-function CategoriesPage({ categories, products, sort, currentCategory }) {
+function CategoriesPage({
+    categories,
+    products,
+    sort,
+    search,
+    currentCategory,
+}) {
     const slug = currentCategory?.slug;
+
+    const [searchInput, setSearchInput] = useState(search);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (searchInput !== search) {
+                router.get(
+                    `/collections${slug ? `/${slug}` : ""}`,
+                    {
+                        search: searchInput,
+                        sort: sort,
+                        page: products.current_page,
+                    },
+                    {
+                        preserveScroll: true,
+                        preserveState: true,
+                    }
+                );
+            }
+        }, 700);
+
+        return () => clearTimeout(timeout);
+    }, [searchInput]);
 
     const handleSortChange = (e) => {
         router.get(
             `/collections${slug ? `/${slug}` : ""}`,
             {
+                search: search,
                 sort: e.target.value,
+                page: products.current_page,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+            }
+        );
+    };
+
+    const handleSearchChange = (e) => {
+        router.get(
+            `/collections${slug ? `/${slug}` : ""}`,
+            {
+                search: e.target.value,
+                sort: sort,
                 page: products.current_page,
             },
             {
@@ -59,6 +106,7 @@ function CategoriesPage({ categories, products, sort, currentCategory }) {
         router.get(
             `/collections${slug ? `/${slug}` : ""}`,
             {
+                search: search,
                 sort: sort,
                 page: page,
             },
@@ -76,6 +124,21 @@ function CategoriesPage({ categories, products, sort, currentCategory }) {
             <div className="lg:h-16 p-5 col-span-full flex flex-col items-start gap-5 lg:flex-row lg:items-center">
                 <Breadcrumbs data={getBreadcrumbsData(currentCategory)} />
                 <div className="lg:ms-auto">{products.total} Products</div>
+                <TextField
+                    size="small"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="rounded-xl"
+                    slotProps={{
+                        input: {
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <SearchOutlined />
+                                </InputAdornment>
+                            ),
+                        },
+                    }}
+                />
                 <SortMenu value={sort} onChange={handleSortChange} />
             </div>
 

@@ -17,6 +17,8 @@ class WishlistController extends Controller
 
     public function add(Request $request)
     {
+        if (Auth::user()?->role === 'admin') return;
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
         ]);
@@ -49,6 +51,8 @@ class WishlistController extends Controller
 
     public function toggle(Request $request)
     {
+        if (Auth::user()?->role === 'admin') return;
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
         ]);

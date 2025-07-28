@@ -37,11 +37,14 @@ class AuthenticatedSessionController extends Controller
             $route = '/profile';
         }
 
-        $response =  MergeController::handleConflict($user);
+        if ($role === 'customer') {
+            $response =  MergeController::handleConflict($user);
 
-        if ($response) {
-            return $response;
+            if ($response) {
+                return $response;
+            }
         }
+
 
         return redirect()->intended($route);
     }

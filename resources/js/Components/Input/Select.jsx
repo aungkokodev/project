@@ -8,7 +8,6 @@ function Select({ ...props }) {
     return (
         <FormControl error={!!props.error} className={props.className}>
             <MuiSelect
-                // size="small"
                 {...props}
                 sx={{
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {

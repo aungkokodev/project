@@ -14,6 +14,7 @@ class CategoryController extends Controller
     {
         $sort = $request->input('sort', 'newest');
         $page = $request->input('page', 1);
+        $search = $request->input('search');
 
         $categories = Category::with(['children'])
             ->whereNull('parent_id')
@@ -23,6 +24,15 @@ class CategoryController extends Controller
             ->where('is_active', true)
             ->withAvg(['reviews' => fn($q) => $q->where('is_approved', true)], 'rating')
             ->withCount(['reviews' => fn($q) => $q->where('is_approved', true)]);
+
+        if ($search) {
+            $productsQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhereHas('category', function ($q) use ($search) {
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
 
         if ($slug) {
             $category = Category::where('slug', $slug)
@@ -52,6 +62,7 @@ class CategoryController extends Controller
             'categories' => $categories,
             'products' => $products,
             'sort' => $sort,
+            'search' => $search,
             'currentCategory' => $slug ? $category ?? null : null,
         ]);
     }
