@@ -58,24 +58,30 @@ DB_PASSWORD=
 php artisan key:generate
 ```
 
-7. Run migrations:
+7. Create a symbolic link from public/storage to storage/app/public
+
+```bash
+php artisan storage:link
+```
+
+8. Run migrations:
 
 ```bash
 php artisan migrate
 ```
 
-8.  Seed the database:
+9.  Seed the database:
 
 ```bash
 php artisan db:seed
 ```
 
-9. Start the development server:
+10. Start the development server:
 
 ```bash
 composer run dev
 ```
 
-10. Visit the app in your browser at [http://localhost:8000](http://localhost:8000)
+11. Visit the app in your browser at [http://localhost:8000](http://localhost:8000)
 
 ---
